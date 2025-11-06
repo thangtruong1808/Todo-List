@@ -280,7 +280,7 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-gray-800">All Tasks</h2>
+        <h2 className="text-2xl font-bold text-gray-800">List View: All Tasks</h2>
         <div className="flex items-center space-x-2">
           <label htmlFor="rowsPerPage" className="text-sm font-medium text-gray-700">
             Rows per page:
@@ -586,11 +586,10 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
                         <button
                           key={page}
                           onClick={() => handlePageChange(page as number)}
-                          className={`px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${
-                            currentPage === page
+                          className={`px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${currentPage === page
                               ? 'bg-blue-600 text-white'
                               : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-                          }`}
+                            }`}
                         >
                           {page}
                         </button>
@@ -615,119 +614,119 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
               </div>
             </div>
           )}
-            </>
-          )}
+        </>
+      )}
 
-          {/* Delete Confirmation Modal */}
-          {showDeleteModal && taskToDelete && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-                <div className="p-6">
-                  {/* Modal Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full">
-                        <FaExclamationTriangle className="text-red-600 text-xl" />
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-800">Confirm Delete</h3>
-                    </div>
-                    <button
-                      onClick={handleCancelDelete}
-                      disabled={isDeleting}
-                      className="text-gray-400 hover:text-gray-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                    >
-                      <FaTimes className="text-xl" />
-                    </button>
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && taskToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full">
+                    <FaExclamationTriangle className="text-red-600 text-xl" />
                   </div>
+                  <h3 className="text-xl font-bold text-gray-800">Confirm Delete</h3>
+                </div>
+                <button
+                  onClick={handleCancelDelete}
+                  disabled={isDeleting}
+                  className="text-gray-400 hover:text-gray-600 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                >
+                  <FaTimes className="text-xl" />
+                </button>
+              </div>
 
-                  {/* Modal Body */}
-                  <div className="mb-6">
-                    <p className="text-gray-700 mb-4">
-                      Are you sure you want to delete this task? This action cannot be undone.
-                    </p>
-                    <div className="bg-gray-50 rounded-md p-4 border border-gray-200">
-                      <div className="space-y-3">
-                        <div>
-                          <span className="text-sm font-medium text-gray-600">ID:</span>
-                          <span className="ml-2 text-sm text-gray-800">{taskToDelete.id}</span>
-                        </div>
-                        <div>
-                          <span className="text-sm font-medium text-gray-600">Title:</span>
-                          <span className="ml-2 text-sm text-gray-800">{taskToDelete.title}</span>
-                        </div>
-                        {taskToDelete.description && (
-                          <div>
-                            <span className="text-sm font-medium text-gray-600">Description:</span>
-                            <p className="ml-2 text-sm text-gray-800 mt-1">{taskToDelete.description}</p>
-                          </div>
-                        )}
-                        <div>
-                          <span className="text-sm font-medium text-gray-600">Status:</span>
-                          <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(taskToDelete.status)}`}>
-                            {taskToDelete.status}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-sm font-medium text-gray-600">Task Code:</span>
-                          <span className="ml-2 text-sm text-gray-800">{taskToDelete.taskcode}</span>
-                        </div>
-                        {taskToDelete.due_date && (
-                          <div>
-                            <span className="text-sm font-medium text-gray-600">Due Date:</span>
-                            <span className="ml-2 text-sm text-gray-800">{formatDate(taskToDelete.due_date)}</span>
-                          </div>
-                        )}
-                        {taskToDelete.created_at && (
-                          <div>
-                            <span className="text-sm font-medium text-gray-600">Created At:</span>
-                            <span className="ml-2 text-sm text-gray-800">{formatDate(taskToDelete.created_at)}</span>
-                          </div>
-                        )}
-                        {taskToDelete.updated_at && (
-                          <div>
-                            <span className="text-sm font-medium text-gray-600">Updated At:</span>
-                            <span className="ml-2 text-sm text-gray-800">{formatDate(taskToDelete.updated_at)}</span>
-                          </div>
-                        )}
-                      </div>
+              {/* Modal Body */}
+              <div className="mb-6">
+                <p className="text-gray-700 mb-4">
+                  Are you sure you want to delete this task? This action cannot be undone.
+                </p>
+                <div className="bg-gray-50 rounded-md p-4 border border-gray-200">
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-sm font-medium text-gray-600">ID:</span>
+                      <span className="ml-2 text-sm text-gray-800">{taskToDelete.id}</span>
                     </div>
-                  </div>
-
-                  {/* Modal Footer */}
-                  <div className="flex justify-end space-x-3">
-                    <button
-                      onClick={handleCancelDelete}
-                      disabled={isDeleting}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
-                    >
-                      <FaTimes />
-                      <span>Cancel</span>
-                    </button>
-                    <button
-                      onClick={handleConfirmDelete}
-                      disabled={isDeleting}
-                      className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
-                    >
-                      {isDeleting ? (
-                        <>
-                          <FaSpinner className="animate-spin" />
-                          <span>Deleting...</span>
-                        </>
-                      ) : (
-                        <>
-                          <FaTrash />
-                          <span>Delete</span>
-                        </>
-                      )}
-                    </button>
+                    <div>
+                      <span className="text-sm font-medium text-gray-600">Title:</span>
+                      <span className="ml-2 text-sm text-gray-800">{taskToDelete.title}</span>
+                    </div>
+                    {taskToDelete.description && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Description:</span>
+                        <p className="ml-2 text-sm text-gray-800 mt-1">{taskToDelete.description}</p>
+                      </div>
+                    )}
+                    <div>
+                      <span className="text-sm font-medium text-gray-600">Status:</span>
+                      <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(taskToDelete.status)}`}>
+                        {taskToDelete.status}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-600">Task Code:</span>
+                      <span className="ml-2 text-sm text-gray-800">{taskToDelete.taskcode}</span>
+                    </div>
+                    {taskToDelete.due_date && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Due Date:</span>
+                        <span className="ml-2 text-sm text-gray-800">{formatDate(taskToDelete.due_date)}</span>
+                      </div>
+                    )}
+                    {taskToDelete.created_at && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Created At:</span>
+                        <span className="ml-2 text-sm text-gray-800">{formatDate(taskToDelete.created_at)}</span>
+                      </div>
+                    )}
+                    {taskToDelete.updated_at && (
+                      <div>
+                        <span className="text-sm font-medium text-gray-600">Updated At:</span>
+                        <span className="ml-2 text-sm text-gray-800">{formatDate(taskToDelete.updated_at)}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      );
-    };
 
-    export default TasksTable;
+              {/* Modal Footer */}
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={handleCancelDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <FaTimes />
+                  <span>Cancel</span>
+                </button>
+                <button
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
+                >
+                  {isDeleting ? (
+                    <>
+                      <FaSpinner className="animate-spin" />
+                      <span>Deleting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FaTrash />
+                      <span>Delete</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TasksTable;
 

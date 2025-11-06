@@ -1,5 +1,5 @@
 import pool from '../config/database';
-import { Task, TaskStatus } from '../models/todo.model';
+import { Task } from '../models/todo.model';
 
 export const taskService = {
   getAllTasks: async (): Promise<Task[]> => {
