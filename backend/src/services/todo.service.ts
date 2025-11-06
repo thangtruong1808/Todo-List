@@ -1,3 +1,13 @@
+/**
+ * Todo Service
+ * 
+ * Description: Service layer for task operations (CRUD).
+ *              Handles database queries and business logic for tasks.
+ * 
+ * Date Created: 2025-November-06
+ * Author: thangtruong
+ */
+
 import pool from '../config/database';
 import { Task } from '../models/todo.model';
 

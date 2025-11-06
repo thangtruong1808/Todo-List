@@ -12,7 +12,7 @@
 import { TaskStatus } from '../../types';
 import { FaFilter } from 'react-icons/fa';
 
-// Status options
+// Status options - available task status values for filtering
 const statusOptions: TaskStatus[] = ['Pending', 'In Progress', 'Completed', 'Archived', 'Overdue'];
 
 interface StatusFilterProps {

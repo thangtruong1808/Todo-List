@@ -1,3 +1,13 @@
+/**
+ * Todo Model
+ * 
+ * Description: TypeScript type definitions for Task and TaskStatus.
+ *              Defines the data structure for tasks in the application.
+ * 
+ * Date Created: 2025-November-06
+ * Author: thangtruong
+ */
+
 export type TaskStatus = 'Pending' | 'In Progress' | 'Completed' | 'Archived' | 'Overdue';
 
 export interface Task {

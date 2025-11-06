@@ -1,3 +1,13 @@
+/**
+ * Todo Routes
+ * 
+ * Description: Express router for task API endpoints.
+ *              Defines all HTTP routes for task operations (CRUD).
+ * 
+ * Date Created: 2025-November-06
+ * Author: thangtruong
+ */
+
 import { Router } from 'express';
 import * as taskController from '../controllers/todo.controller';
 

@@ -4,25 +4,24 @@
  * Description: Kanban board component with drag-and-drop functionality.
  *              Displays tasks in columns based on their status.
  *              Allows users to drag tasks between columns to update status.
- *              Includes pagination to display 3 rows of cards per column.
+ *              Uses vertical scrolling to display all tasks in each column.
  *
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { toast } from 'react-toastify';
 import { Task, TaskStatus } from '../../types';
 import { getAllTasks, updateTask } from '../../services/taskService';
 import TaskCard from './TaskCard';
 import TaskDetailModal from './TaskDetailModal';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-// Status columns configuration
+// Status columns configuration - order of columns in Kanban board
 const statusColumns: TaskStatus[] = ['Pending', 'In Progress', 'Completed', 'Archived', 'Overdue'];
 
-// Column display names
+// Column display names - mapping of status to display name
 const columnNames: Record<TaskStatus, string> = {
   'Pending': 'Pending',
   'In Progress': 'In Progress',
@@ -30,9 +29,6 @@ const columnNames: Record<TaskStatus, string> = {
   'Archived': 'Archived',
   'Overdue': 'Overdue',
 };
-
-// Cards per page (3 rows)
-const CARDS_PER_PAGE = 3;
 
 interface KanbanBoardProps {
   onTaskUpdate?: () => void;
@@ -48,14 +44,6 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
   const [error, setError] = useState<string | null>(null);
   // State for selected task in modal
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  // State for pagination per column
-  const [currentPages, setCurrentPages] = useState<Record<TaskStatus, number>>({
-    'Pending': 1,
-    'In Progress': 1,
-    'Completed': 1,
-    'Archived': 1,
-    'Overdue': 1,
-  });
 
   // Fetch tasks from API
   const fetchTasks = async () => {
@@ -94,31 +82,8 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
     return (statusTasks.length / totalTasks) * 100;
   };
 
-  // Get paginated tasks for a specific status column
-  const getPaginatedTasks = (status: TaskStatus): Task[] => {
-    const allTasks = getTasksByStatus(status);
-    const currentPage = currentPages[status];
-    const startIndex = (currentPage - 1) * CARDS_PER_PAGE;
-    const endIndex = startIndex + CARDS_PER_PAGE;
-    return allTasks.slice(startIndex, endIndex);
-  };
-
-  // Get total pages for a specific status column
-  const getTotalPages = (status: TaskStatus): number => {
-    const allTasks = getTasksByStatus(status);
-    return Math.ceil(allTasks.length / CARDS_PER_PAGE);
-  };
-
-  // Handle page change for a specific column
-  const handlePageChange = (status: TaskStatus, page: number) => {
-    setCurrentPages((prev) => ({
-      ...prev,
-      [status]: page,
-    }));
-  };
-
-  // Handle drag end
-  const handleDragEnd = async (result: DropResult) => {
+  // Handle drag end - memoized to prevent re-initialization
+  const handleDragEnd = useCallback(async (result: DropResult) => {
     const { destination, source, draggableId } = result;
 
     // If dropped outside a droppable area
@@ -131,11 +96,14 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
       return;
     }
 
-    // Get the task being dragged from the source column's full list
-    const sourceStatus = source.droppableId as TaskStatus;
-    const sourceTasks = getTasksByStatus(sourceStatus);
-    const task = sourceTasks[source.index];
-    
+    // Get the task being dragged - find by ID from draggableId
+    const taskId = parseInt(draggableId, 10);
+    if (isNaN(taskId)) {
+      return;
+    }
+
+    // Find task by ID
+    const task = tasks.find((t) => t.id === taskId);
     if (!task || !task.id) {
       return;
     }
@@ -153,13 +121,6 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
       t.id === task.id ? { ...t, status: newStatus } : t
     );
     setTasks(updatedTasks);
-
-    // Reset pagination for affected columns
-    setCurrentPages((prev) => ({
-      ...prev,
-      [sourceStatus]: 1,
-      [newStatus]: 1,
-    }));
 
     // Update task status via API
     try {
@@ -188,7 +149,7 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
         draggable: true,
       });
     }
-  };
+  }, [tasks, onTaskUpdate]);
 
   // Handle task card click
   const handleTaskClick = (task: Task) => {
@@ -227,7 +188,7 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full" key={`kanban-${tasks.length}-${selectedStatuses.join(',')}`}>
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {statusColumns.map((status) => {
@@ -236,9 +197,6 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
               return null;
             }
             const allColumnTasks = getTasksByStatus(status);
-            const paginatedTasks = getPaginatedTasks(status);
-            const totalPages = getTotalPages(status);
-            const currentPage = currentPages[status];
 
             return (
               <div key={status} className="flex flex-col">
@@ -254,24 +212,21 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
                 {/* Droppable Column */}
                 <Droppable droppableId={status}>
                   {(provided, snapshot) => {
-                    const startIndex = (currentPage - 1) * CARDS_PER_PAGE;
-                    const endIndex = startIndex + CARDS_PER_PAGE;
                     return (
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`flex-1 min-h-[200px] max-h-[600px] p-3 rounded-b-lg transition-colors duration-200 ${
-                          snapshot.isDraggingOver ? 'bg-blue-50' : 'bg-gray-50'
-                        }`}
+                        className={`flex-1 min-h-[200px] max-h-[900px] p-3 rounded-b-lg transition-colors duration-200 ${snapshot.isDraggingOver ? 'bg-blue-50' : 'bg-gray-50'
+                          }`}
                         style={{ overflowY: 'auto' }}
                       >
                         {allColumnTasks.map((task, index) => {
-                          // Check if this task should be visible (on current page)
-                          const isVisible = index >= startIndex && index < endIndex;
+                          // Ensure draggableId is always a valid string
+                          const draggableId = task.id ? task.id.toString() : `task-${index}-${status}`;
                           return (
                             <Draggable
-                              key={task.id?.toString()}
-                              draggableId={task.id?.toString() || ''}
+                              key={draggableId}
+                              draggableId={draggableId}
                               index={index}
                             >
                               {(provided, snapshot) => (
@@ -281,12 +236,10 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
                                   {...provided.dragHandleProps}
                                   style={{
                                     ...provided.draggableProps.style,
-                                    marginBottom: isVisible ? '12px' : '0',
-                                    display: isVisible ? 'block' : 'none',
+                                    marginBottom: '12px',
                                   }}
-                                  className={`${
-                                    snapshot.isDragging ? 'opacity-50' : 'opacity-100'
-                                  }`}
+                                  className={`${snapshot.isDragging ? 'opacity-50' : 'opacity-100'
+                                    }`}
                                 >
                                   <TaskCard task={task} onClick={() => handleTaskClick(task)} />
                                 </div>
@@ -299,31 +252,6 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
                     );
                   }}
                 </Droppable>
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="bg-gray-100 rounded-b-lg p-2 border-t border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <button
-                        onClick={() => handlePageChange(status, currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="px-2 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center"
-                      >
-                        <FaChevronLeft className="text-xs" />
-                      </button>
-                      <span className="text-xs text-gray-600">
-                        Page {currentPage} of {totalPages}
-                      </span>
-                      <button
-                        onClick={() => handlePageChange(status, currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="px-2 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center"
-                      >
-                        <FaChevronRight className="text-xs" />
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             );
           })}

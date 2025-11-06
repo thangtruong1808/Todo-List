@@ -14,17 +14,17 @@ import { FaLinkedin, FaGithub, FaFacebook, FaGlobe } from 'react-icons/fa';
 import authorPhoto from '../assets/images/thangtruong.jpg';
 
 const Footer = () => {
-  // App information
+  // App information - application name and description
   const appName = 'Todo List App';
   const appDescription = 'A modern and intuitive task management application designed to help you stay organized and productive.';
 
-  // Author information from environment variables
+  // Author information from environment variables - social media links
   const authorName = import.meta.env.VITE_AUTHOR_NAME || '';
   const linkedinUrl = import.meta.env.VITE_AUTHOR_LINKEDIN_URL || '#';
   const githubUrl = import.meta.env.VITE_AUTHOR_GITHUB_URL || '#';
   const facebookUrl = import.meta.env.VITE_AUTHOR_FACEBOOK_URL || '#';
 
-  // Navigation items for quick links
+  // Navigation items for quick links - footer navigation menu
   const quickLinks = [
     { path: '/', label: 'Home' },
     { path: '/tasks', label: 'Tasks' },
@@ -33,7 +33,7 @@ const Footer = () => {
     { path: '/about', label: 'About' },
   ];
 
-  // Tech stack from package.json
+  // Tech stack - technologies used in the application
   const techStack = [
     'React',
     'TypeScript',

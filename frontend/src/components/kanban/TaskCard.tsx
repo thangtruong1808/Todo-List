@@ -11,7 +11,7 @@
  */
 
 import { Task } from '../../types';
-import { FaCalendarAlt, FaBarcode, FaEye } from 'react-icons/fa';
+import { FaCalendarAlt, FaBarcode, FaEye, FaAlignLeft } from 'react-icons/fa';
 
 interface TaskCardProps {
   task: Task;
@@ -76,7 +76,10 @@ const TaskCard = ({ task, onClick }: TaskCardProps) => {
         </div>
       )}
       {task.description && (
-        <p className="text-xs text-gray-600 mb-2 line-clamp-2">{task.description}</p>
+        <div className="flex items-start gap-2 mb-2">
+          <FaAlignLeft className="text-xs text-gray-500 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-gray-600 line-clamp-3">{task.description}</p>
+        </div>
       )}
       <div className="mt-2">
         <span

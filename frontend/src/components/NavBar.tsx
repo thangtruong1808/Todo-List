@@ -61,7 +61,7 @@ const NavBar = () => {
   }, [isMobileMenuOpen]);
 
   return (
-    <nav ref={navRef} className="bg-white shadow-md">
+    <nav ref={navRef} className="bg-white shadow-md ">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Title with Icon - Clickable to navigate to Home */}

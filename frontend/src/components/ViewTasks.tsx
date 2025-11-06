@@ -14,7 +14,7 @@ import { TaskStatus } from '../types';
 import KanbanBoard from './kanban/KanbanBoard';
 import StatusFilter from './kanban/StatusFilter';
 
-// All available statuses
+// All available statuses - default statuses for filter (all selected)
 const allStatuses: TaskStatus[] = ['Pending', 'In Progress', 'Completed', 'Archived', 'Overdue'];
 
 const ViewTasks = () => {

@@ -1,3 +1,13 @@
+/**
+ * Todo Controller
+ * 
+ * Description: Handles HTTP requests for task operations (CRUD).
+ *              Validates input data and delegates business logic to task service.
+ * 
+ * Date Created: 2025-November-06
+ * Author: thangtruong
+ */
+
 import { Request, Response } from 'express';
 import { taskService } from '../services/todo.service';
 
@@ -6,7 +16,6 @@ export const getAllTasks = async (req: Request, res: Response) => {
     const tasks = await taskService.getAllTasks();
     res.json(tasks);
   } catch (error: any) {
-    console.error('Error fetching tasks:', error);
     res.status(500).json({ error: 'Internal server error', message: error.message });
   }
 };
@@ -26,7 +35,6 @@ export const getTaskById = async (req: Request, res: Response) => {
     }
     res.json(task);
   } catch (error: any) {
-    console.error('Error fetching task:', error);
     res.status(500).json({ error: 'Internal server error', message: error.message });
   }
 };
@@ -58,7 +66,6 @@ export const createTask = async (req: Request, res: Response) => {
 
     res.status(201).json(task);
   } catch (error: any) {
-    console.error('Error creating task:', error);
     res.status(500).json({ error: 'Internal server error', message: error.message });
   }
 };
@@ -90,7 +97,6 @@ export const updateTask = async (req: Request, res: Response) => {
     }
     res.json(task);
   } catch (error: any) {
-    console.error('Error updating task:', error);
     res.status(500).json({ error: 'Internal server error', message: error.message });
   }
 };
@@ -110,7 +116,6 @@ export const deleteTask = async (req: Request, res: Response) => {
     }
     res.json({ message: 'Task deleted successfully' });
   } catch (error: any) {
-    console.error('Error deleting task:', error);
     res.status(500).json({ error: 'Internal server error', message: error.message });
   }
 };

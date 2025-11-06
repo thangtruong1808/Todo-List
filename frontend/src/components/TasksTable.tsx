@@ -62,7 +62,7 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
   // State for deleting
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  // Row per page options
+  // Row per page options - available pagination sizes
   const rowsPerPageOptions = [5, 10, 20, 50, 100];
 
   // Fetch tasks from API
@@ -587,8 +587,8 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
                           key={page}
                           onClick={() => handlePageChange(page as number)}
                           className={`px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${currentPage === page
-                              ? 'bg-blue-600 text-white'
-                              : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
                             }`}
                         >
                           {page}

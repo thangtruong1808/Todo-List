@@ -19,7 +19,7 @@ interface StatusFieldProps {
   watchedFields: TaskFormData;
 }
 
-// Status options
+// Status options - available task status values
 const statusOptions: TaskStatus[] = ['Pending', 'In Progress', 'Completed', 'Archived', 'Overdue'];
 
 const StatusField = ({ register, errors, touchedFields, watchedFields }: StatusFieldProps) => {
