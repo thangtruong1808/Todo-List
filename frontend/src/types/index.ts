@@ -11,3 +11,11 @@ export interface Task {
   updated_at?: string;
 }
 
+export interface TaskFormData {
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  taskcode: string;
+  due_date: string;
+}
+

@@ -2,7 +2,7 @@
  * App Component
  * 
  * Description: Main application component that serves as the root component.
- *              Includes NavBar, main content area, and Footer.
+ *              Includes NavBar, main content area, Footer, and ToastContainer for notifications.
  *              Uses React Router for URL-based navigation.
  * 
  * Date Created: 2025-November-06
@@ -10,6 +10,8 @@
  */
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import NavBar from './components/NavBar';
 import Footer from './components/Footer';
 import Home from './components/Home';
@@ -38,6 +40,20 @@ function App() {
 
         {/* Footer */}
         <Footer />
+
+        {/* Toast Container */}
+        <ToastContainer
+          position="bottom-left"
+          autoClose={7000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </div>
     </BrowserRouter>
   )

@@ -1,24 +1,56 @@
 /**
  * Tasks Component
  * 
- * Description: Tasks page component for creating and managing tasks.
- *              Implementation will be added later.
+ * Description: Tasks page component for creating, editing, and managing tasks.
+ *              Integrates CreateTaskForm and TasksTable components.
+ *              Manages state for editing task and coordinates between form and table.
+ *              Provides functionality to create new tasks, edit existing tasks, and view all tasks with pagination.
+ *              Automatically scrolls to form when edit button is clicked.
  * 
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
 
+import { useState } from 'react';
+import CreateTaskForm from './CreateTaskForm';
+import TasksTable from './TasksTable';
+import { Task } from '../types';
+
 const Tasks = () => {
+  // State to trigger table refresh
+  const [refreshKey, setRefreshKey] = useState<number>(0);
+  // State for editing task
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+  // Handle task created/updated callback
+  const handleTaskCreated = () => {
+    // Increment refresh key to trigger table refresh
+    setRefreshKey((prev) => prev + 1);
+    // Clear editing task
+    setEditingTask(null);
+  };
+
+  // Handle edit task
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingTask(null);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center">
-          Welcome to Tasks
-        </h1>
-        <p className="text-lg text-gray-600 text-center">
-          This section will be implemented later.
-        </p>
-      </div>
+    <div className="max-w-7xl mx-auto">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Tasks Management</h1>
+      <CreateTaskForm
+        onTaskCreated={handleTaskCreated}
+        editingTask={editingTask}
+        onCancelEdit={handleCancelEdit}
+      />
+      <TasksTable refreshKey={refreshKey} onEditTask={handleEditTask} />
     </div>
   );
 };

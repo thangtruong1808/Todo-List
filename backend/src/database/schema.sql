@@ -11,13 +11,21 @@ CREATE TABLE IF NOT EXISTS tasks (
     status ENUM('Pending', 'In Progress', 'Completed', 'Archived', 'Overdue') DEFAULT 'Pending',  	
     -- Task status
     taskcode VARCHAR(5) UNIQUE NOT NULL,                        								-- Task code is exactly 5 characters (alphanumeric)
-	  due_date DATETIME,  																
+	  due_date DATETIME NOT NULL,  																
   -- Due date field for each task
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- Date when the task was created
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP  					
     -- Date when the task was last updated    
 );
+
+-- Create indexes to improve search and filtering performance
+CREATE INDEX idx_title ON tasks(title);
+CREATE INDEX idx_status ON tasks(status);
+CREATE INDEX idx_due_date ON tasks(due_date);
+CREATE INDEX idx_status_due_date ON tasks(status, due_date);
+CREATE INDEX idx_created_at ON tasks(created_at);
+CREATE INDEX idx_updated_at ON tasks(updated_at);
 
 -- Insert sample data
 INSERT INTO tasks (title, description, status, taskcode, due_date)
