@@ -1,4 +1,22 @@
+/**
+ * Global Styles
+ * 
+ * Description: Global CSS styles for the application.
+ *              Includes Tailwind CSS directives and base font styling.
+ * 
+ * Date Created: 2025-November-06
+ * Author: thangtruong
+ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
 
