@@ -1,22 +1,22 @@
 import { Router } from 'express';
-import * as todoController from '../controllers/todo.controller';
+import * as taskController from '../controllers/todo.controller';
 
 const router = Router();
 
-// GET all todos
-router.get('/', todoController.getAllTodos);
+// GET all tasks
+router.get('/', taskController.getAllTasks);
 
-// GET todo by id
-router.get('/:id', todoController.getTodoById);
+// GET task by id
+router.get('/:id', taskController.getTaskById);
 
-// POST create todo
-router.post('/', todoController.createTodo);
+// POST create task
+router.post('/', taskController.createTask);
 
-// PUT update todo
-router.put('/:id', todoController.updateTodo);
+// PUT update task
+router.put('/:id', taskController.updateTask);
 
-// DELETE todo
-router.delete('/:id', todoController.deleteTodo);
+// DELETE task
+router.delete('/:id', taskController.deleteTask);
 
 export default router;
 

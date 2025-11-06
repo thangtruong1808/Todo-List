@@ -19,7 +19,7 @@ app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Todo List API is running' });
 });
 
-app.use('/api/todos', todoRoutes);
+app.use('/api/tasks', todoRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

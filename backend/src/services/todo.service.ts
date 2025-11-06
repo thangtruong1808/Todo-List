@@ -1,30 +1,76 @@
 import pool from '../config/database';
-import { Todo } from '../models/todo.model';
+import { Task, TaskStatus } from '../models/todo.model';
 
-export const todoService = {
-  getAllTodos: async (): Promise<Todo[]> => {
-    // TODO: Implement database query
-    return [];
+export const taskService = {
+  getAllTasks: async (): Promise<Task[]> => {
+    const [rows] = await pool.execute('SELECT * FROM tasks ORDER BY created_at DESC');
+    return rows as Task[];
   },
 
-  getTodoById: async (id: number): Promise<Todo | null> => {
-    // TODO: Implement database query
-    return null;
+  getTaskById: async (id: number): Promise<Task | null> => {
+    const [rows] = await pool.execute('SELECT * FROM tasks WHERE id = ?', [id]);
+    const tasks = rows as Task[];
+    return tasks.length > 0 ? tasks[0] : null;
   },
 
-  createTodo: async (todo: Omit<Todo, 'id' | 'created_at' | 'updated_at'>): Promise<Todo> => {
-    // TODO: Implement database query
-    return {} as Todo;
+  getTaskByCode: async (taskcode: string): Promise<Task | null> => {
+    const [rows] = await pool.execute('SELECT * FROM tasks WHERE taskcode = ?', [taskcode]);
+    const tasks = rows as Task[];
+    return tasks.length > 0 ? tasks[0] : null;
   },
 
-  updateTodo: async (id: number, todo: Partial<Todo>): Promise<Todo | null> => {
-    // TODO: Implement database query
-    return null;
+  createTask: async (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>): Promise<Task> => {
+    const { title, description, status, taskcode, due_date } = task;
+    const [result] = await pool.execute(
+      'INSERT INTO tasks (title, description, status, taskcode, due_date) VALUES (?, ?, ?, ?, ?)',
+      [title, description || null, status, taskcode, due_date || null]
+    );
+    const insertId = (result as any).insertId;
+    const newTask = await taskService.getTaskById(insertId);
+    return newTask!;
   },
 
-  deleteTodo: async (id: number): Promise<boolean> => {
-    // TODO: Implement database query
-    return false;
+  updateTask: async (id: number, task: Partial<Task>): Promise<Task | null> => {
+    const fields: string[] = [];
+    const values: any[] = [];
+
+    if (task.title !== undefined) {
+      fields.push('title = ?');
+      values.push(task.title);
+    }
+    if (task.description !== undefined) {
+      fields.push('description = ?');
+      values.push(task.description);
+    }
+    if (task.status !== undefined) {
+      fields.push('status = ?');
+      values.push(task.status);
+    }
+    if (task.taskcode !== undefined) {
+      fields.push('taskcode = ?');
+      values.push(task.taskcode);
+    }
+    if (task.due_date !== undefined) {
+      fields.push('due_date = ?');
+      values.push(task.due_date);
+    }
+
+    if (fields.length === 0) {
+      return await taskService.getTaskById(id);
+    }
+
+    values.push(id);
+    await pool.execute(
+      `UPDATE tasks SET ${fields.join(', ')} WHERE id = ?`,
+      values
+    );
+
+    return await taskService.getTaskById(id);
+  },
+
+  deleteTask: async (id: number): Promise<boolean> => {
+    const [result] = await pool.execute('DELETE FROM tasks WHERE id = ?', [id]);
+    return (result as any).affectedRows > 0;
   },
 };
 

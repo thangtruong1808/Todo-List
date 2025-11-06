@@ -1,8 +1,12 @@
-export interface Todo {
+export type TaskStatus = 'Pending' | 'In Progress' | 'Completed' | 'Archived' | 'Overdue';
+
+export interface Task {
   id?: number;
   title: string;
   description?: string;
-  completed: boolean;
+  status: TaskStatus;
+  taskcode: string;
+  due_date?: string;
   created_at?: string;
   updated_at?: string;
 }
