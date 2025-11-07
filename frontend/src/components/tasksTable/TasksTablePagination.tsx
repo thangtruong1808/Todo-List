@@ -65,7 +65,7 @@ const TasksTablePagination = ({
   const pages = buildPages();
 
   return (
-    <div className="flex items-center justify-between pt-6 border-t border-gray-200 px-2 lg:px-2">
+    <div className="flex items-center justify-between pt-6 pb-3 border-t border-gray-200 px-2 lg:px-2">
       <div className="text-sm text-gray-700">
         Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} tasks
       </div>

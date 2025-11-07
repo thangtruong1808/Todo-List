@@ -38,11 +38,11 @@ const TasksTableGrid = ({
   };
 
   return (
-    <table className="w-full divide-y divide-gray-200 table-fixed">
-      <thead className="bg-gray-50">
+    <table className="w-full divide-y divide-gray-200 lg:table-fixed">
+      <thead className="bg-gray-50 hidden sm:table-header-group">
         <tr>
           <th
-            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 w-16"
+            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 lg:w-16"
             onClick={() => onSort('id')}
           >
             <div className="flex items-center space-x-1">
@@ -51,7 +51,7 @@ const TasksTableGrid = ({
             </div>
           </th>
           <th
-            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 w-24"
+            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 lg:w-24"
             onClick={() => onSort('taskcode')}
           >
             <div className="flex items-center space-x-1">
@@ -60,7 +60,7 @@ const TasksTableGrid = ({
             </div>
           </th>
           <th
-            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 w-56"
+            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 lg:w-56"
             onClick={() => onSort('title')}
           >
             <div className="flex items-center space-x-1">
@@ -70,7 +70,7 @@ const TasksTableGrid = ({
             </div>
           </th>
           <th
-            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell w-72 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell cursor-pointer hover:bg-gray-100 transition-colors duration-200 lg:w-72"
             onClick={() => onSort('description')}
           >
             <div className="flex items-center space-x-1">
@@ -80,7 +80,7 @@ const TasksTableGrid = ({
             </div>
           </th>
           <th
-            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 w-28"
+            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 lg:w-28"
             onClick={() => onSort('status')}
           >
             <div className="flex items-center space-x-1">
@@ -90,7 +90,7 @@ const TasksTableGrid = ({
             </div>
           </th>
           <th
-            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 w-40"
+            className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 lg:w-40"
             onClick={() => onSort('due_date')}
           >
             <div className="flex items-center space-x-1">
@@ -119,55 +119,62 @@ const TasksTableGrid = ({
               {renderSortIcon('updated_at')}
             </div>
           </th>
-          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Action</th>
+          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider lg:w-32">Action</th>
         </tr>
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
         {visibleTasks.map((task) => (
-          <tr key={task.id} className="hover:bg-gray-50">
-            <td className="px-2 py-2 whitespace-nowrap text-xs text-gray-900">{task.id}</td>
-            <td className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-900">{task.taskcode}</td>
-            <td className="px-2 py-2 text-xs text-gray-900 truncate" title={task.title}>
-              {task.title}
+          <tr key={task.id} className="hover:bg-gray-100">
+            <td className="px-2 py-1 text-xs text-gray-900">
+              <div className="flex flex-col sm:block">
+                <span className="font-semibold sm:font-normal">{task.id}</span>
+                <span className="sm:hidden text-gray-500">{task.taskcode}</span>
+              </div>
+            </td>
+            <td className="px-2 py-1 text-xs text-gray-900 hidden sm:table-cell lg:whitespace-nowrap">{task.taskcode}</td>
+            <td className="px-2 py-1 text-xs text-gray-900">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="font-medium line-clamp-2" title={task.title}>{task.title}</span>
+                <span className="sm:hidden text-gray-500">Due: {formatTaskDateShort(task.due_date)}</span>
+              </div>
             </td>
             <td
-              className="px-2 py-2 text-xs text-gray-600 truncate hidden lg:table-cell"
+              className="px-2 py-1 text-xs text-gray-600 truncate hidden lg:table-cell"
               title={task.description || 'N/A'}
             >
               {task.description || 'N/A'}
             </td>
-            <td className="px-2 py-2 whitespace-nowrap">
+            <td className="px-2 py-1 text-xs">
               <span className={`px-1.5 py-0.5 text-xs font-semibold rounded-full ${getStatusBadgeColor(task.status)}`}>
                 {task.status}
               </span>
             </td>
-            <td className="px-2 py-2 whitespace-nowrap text-xs text-gray-600">
-              <span className="hidden md:inline">{formatTaskDate(task.due_date)}</span>
-              <span className="md:hidden">{formatTaskDateShort(task.due_date)}</span>
+            <td className="px-2 py-1 text-xs text-gray-600 hidden sm:table-cell lg:whitespace-nowrap">
+              {formatTaskDate(task.due_date)}
             </td>
-            <td className="px-2 py-2 whitespace-nowrap text-xs text-gray-600 hidden xl:table-cell">
+            <td className="px-2 py-1 text-xs text-gray-600 hidden xl:table-cell lg:whitespace-nowrap">
               {formatTaskDateShort(task.created_at)}
             </td>
-            <td className="px-2 py-2 whitespace-nowrap text-xs text-gray-600 hidden xl:table-cell">
+            <td className="px-2 py-1 text-xs text-gray-600 hidden xl:table-cell lg:whitespace-nowrap">
               {formatTaskDateShort(task.updated_at)}
             </td>
-            <td className="px-2 py-2 whitespace-nowrap text-xs">
-              <div className="flex items-center space-x-1">
+            <td className="px-2 py-1 text-xs">
+              <div className="flex items-center justify-end sm:justify-start gap-1">
                 <button
                   onClick={() => task.id && onEditTask(task.id)}
-                  className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 flex items-center space-x-1"
+                  className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 flex items-center gap-1 text-xs"
                   title="Edit task"
                 >
                   <FaEdit className="text-xs" />
-                  <span className="hidden md:inline text-xs">Edit</span>
+                  <span className="hidden sm:inline">Edit</span>
                 </button>
                 <button
                   onClick={() => task.id && onDeleteTask(task.id)}
-                  className="px-2 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-200 flex items-center space-x-1"
+                  className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-200 flex items-center gap-1 text-xs"
                   title="Delete task"
                 >
                   <FaTrash className="text-xs" />
-                  <span className="hidden md:inline text-xs">Delete</span>
+                  <span className="hidden sm:inline">Delete</span>
                 </button>
               </div>
             </td>
