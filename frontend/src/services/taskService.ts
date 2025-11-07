@@ -10,6 +10,9 @@
 
 import api from './api';
 import { Task, TaskStatus } from '../types';
+import { normalizeToMelbourneIso } from '../utils/dateUtils';
+
+const isActiveStatus = (status: TaskStatus) => status === 'Pending' || status === 'In Progress';
 
 const shouldMarkTaskAsOverdue = (task: Task, now: Date): task is Task & { id: number } => {
   if (!task.id) {
@@ -20,11 +23,16 @@ const shouldMarkTaskAsOverdue = (task: Task, now: Date): task is Task & { id: nu
     return false;
   }
 
-  if (task.status !== 'Pending' && task.status !== 'In Progress') {
+  if (!isActiveStatus(task.status)) {
     return false;
   }
 
-  const dueDate = new Date(task.due_date);
+  const normalizedDueDate = normalizeToMelbourneIso(task.due_date);
+  if (!normalizedDueDate) {
+    return false;
+  }
+
+  const dueDate = new Date(normalizedDueDate);
   if (Number.isNaN(dueDate.getTime())) {
     return false;
   }
@@ -32,18 +40,48 @@ const shouldMarkTaskAsOverdue = (task: Task, now: Date): task is Task & { id: nu
   return dueDate.getTime() < now.getTime();
 };
 
+const shouldResetOverdueStatus = (task: Task, now: Date): task is Task & { id: number } => {
+  if (!task.id) {
+    return false;
+  }
+
+  if (task.status !== 'Overdue') {
+    return false;
+  }
+
+  if (!task.due_date) {
+    return false;
+  }
+
+  const normalizedDueDate = normalizeToMelbourneIso(task.due_date);
+  if (!normalizedDueDate) {
+    return false;
+  }
+
+  const dueDate = new Date(normalizedDueDate);
+  if (Number.isNaN(dueDate.getTime())) {
+    return false;
+  }
+
+  return dueDate.getTime() >= now.getTime();
+};
+
 const normalizeOverdueTasks = async (tasks: Task[]): Promise<Task[]> => {
   const now = new Date();
   const overdueCandidates = tasks.filter((task): task is Task & { id: number } => shouldMarkTaskAsOverdue(task, now));
+  const resetCandidates = tasks.filter((task): task is Task & { id: number } => shouldResetOverdueStatus(task, now));
 
-  if (overdueCandidates.length === 0) {
+  if (overdueCandidates.length === 0 && resetCandidates.length === 0) {
     return tasks;
   }
 
   const updates = await Promise.all(
-    overdueCandidates.map(async (task) => {
+    [
+      ...overdueCandidates.map<Task & { desiredStatus: TaskStatus }>((task) => ({ ...task, desiredStatus: 'Overdue' })),
+      ...resetCandidates.map<Task & { desiredStatus: TaskStatus }>((task) => ({ ...task, desiredStatus: 'Pending' })),
+    ].map(async (task) => {
       try {
-        const response = await api.put(`/tasks/${task.id}`, { status: 'Overdue' satisfies TaskStatus });
+        const response = await api.put(`/tasks/${task.id}`, { status: task.desiredStatus satisfies TaskStatus });
         return response.data as Task;
       } catch (error) {
         return null;
@@ -64,6 +102,9 @@ const normalizeOverdueTasks = async (tasks: Task[]): Promise<Task[]> => {
     }
     if (shouldMarkTaskAsOverdue(task, now)) {
       return { ...task, status: 'Overdue' };
+    }
+    if (shouldResetOverdueStatus(task, now)) {
+      return { ...task, status: 'Pending' };
     }
     return task;
   });

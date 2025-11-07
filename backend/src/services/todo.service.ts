@@ -69,6 +69,8 @@ export const taskService = {
       return await taskService.getTaskById(id);
     }
 
+    fields.push('updated_at = NOW()');
+
     values.push(id);
     await pool.execute(
       `UPDATE tasks SET ${fields.join(', ')} WHERE id = ?`,

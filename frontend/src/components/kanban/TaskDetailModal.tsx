@@ -11,7 +11,7 @@
 
 import { Task } from '../../types';
 import { FaTimesCircle, FaBarcode, FaFileAlt, FaAlignLeft, FaFlag, FaCalendarAlt, FaCalendarPlus, FaSyncAlt } from 'react-icons/fa';
-import { formatDateTimeInMelbourne } from '../../utils/dateUtils';
+import { formatTaskDate, getStatusBadgeColor } from '../tasksTable/utils';
 
 interface TaskDetailModalProps {
   task: Task | null;
@@ -20,29 +20,6 @@ interface TaskDetailModalProps {
 
 const TaskDetailModal = ({ task, onClose }: TaskDetailModalProps) => {
   if (!task) return null;
-
-  // Format date for display
-  const formatDate = (dateString?: string) => {
-    return formatDateTimeInMelbourne(dateString);
-  };
-
-  // Get status badge color
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'In Progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'Completed':
-        return 'bg-green-100 text-green-800';
-      case 'Archived':
-        return 'bg-gray-100 text-gray-800';
-      case 'Overdue':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div
@@ -131,7 +108,7 @@ const TaskDetailModal = ({ task, onClose }: TaskDetailModalProps) => {
                 </div>
                 <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Due Date</span>
               </div>
-              <p className="text-sm text-gray-900 font-medium pl-11">{formatDate(task.due_date)}</p>
+              <p className="text-sm text-gray-900 font-medium pl-11">{formatTaskDate(task.due_date)}</p>
             </div>
 
             {/* Description */}
@@ -156,7 +133,7 @@ const TaskDetailModal = ({ task, onClose }: TaskDetailModalProps) => {
                   </div>
                   <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Created At</span>
                 </div>
-                <p className="text-sm text-gray-900 font-medium pl-11">{formatDate(task.created_at)}</p>
+                <p className="text-sm text-gray-900 font-medium pl-11">{formatTaskDate(task.created_at)}</p>
               </div>
             )}
 
@@ -169,7 +146,7 @@ const TaskDetailModal = ({ task, onClose }: TaskDetailModalProps) => {
                   </div>
                   <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Updated At</span>
                 </div>
-                <p className="text-sm text-gray-900 font-medium pl-11">{formatDate(task.updated_at)}</p>
+                <p className="text-sm text-gray-900 font-medium pl-11">{formatTaskDate(task.updated_at)}</p>
               </div>
             )}
           </div>

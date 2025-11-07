@@ -12,7 +12,7 @@
 
 import { Task } from '../../types';
 import { FaCalendarAlt, FaBarcode, FaEye, FaAlignLeft } from 'react-icons/fa';
-import { formatDateInMelbourne } from '../../utils/dateUtils';
+import { formatTaskDateShort, getStatusBadgeColor } from '../tasksTable/utils';
 
 interface TaskCardProps {
   task: Task;
@@ -20,29 +20,6 @@ interface TaskCardProps {
 }
 
 const TaskCard = ({ task, onClick }: TaskCardProps) => {
-  // Format date for display
-  const formatDate = (dateString?: string) => {
-    return formatDateInMelbourne(dateString);
-  };
-
-  // Get status badge color
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'In Progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'Completed':
-        return 'bg-green-100 text-green-800';
-      case 'Archived':
-        return 'bg-gray-100 text-gray-800';
-      case 'Overdue':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200 border border-gray-200 relative">
       <div className="flex items-start justify-between mb-2">
@@ -67,7 +44,7 @@ const TaskCard = ({ task, onClick }: TaskCardProps) => {
       {task.due_date && (
         <div className="flex items-center gap-2 mb-2">
           <FaCalendarAlt className="text-xs text-gray-500" />
-          <span className="text-xs text-gray-600">{formatDate(task.due_date)}</span>
+          <span className="text-xs text-gray-600">{formatTaskDateShort(task.due_date, 'No due date')}</span>
         </div>
       )}
       {task.description && (

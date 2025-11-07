@@ -65,7 +65,7 @@ const TasksTablePagination = ({
   const pages = buildPages();
 
   return (
-    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 px-2 lg:px-2">
+    <div className="flex items-center justify-between pt-6 border-t border-gray-200 px-2 lg:px-2">
       <div className="text-sm text-gray-700">
         Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} tasks
       </div>
@@ -104,7 +104,7 @@ const TasksTablePagination = ({
                 className={`px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${isActive
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 {numericPage}
               </button>

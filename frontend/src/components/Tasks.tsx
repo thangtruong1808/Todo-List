@@ -43,9 +43,9 @@ const Tasks = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-8xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Tasks Management</h1>
-      <div className="max-w-5xl w-full">
+      <div className="max-w-8xl w-full">
         <CreateTaskForm
           onTaskCreated={handleTaskCreated}
           editingTask={editingTask}
