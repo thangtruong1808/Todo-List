@@ -20,6 +20,7 @@ import { getAllTasks, updateTask } from '../../services/taskService';
 import { getMelbourneTime, normalizeToMelbourneIso } from '../../utils/dateUtils';
 import TaskCard from './TaskCard';
 import TaskDetailModal from './TaskDetailModal';
+import KanbanBoardLoading from './KanbanBoardLoading';
 
 // Status columns configuration - order of columns in Kanban board
 const statusColumns: TaskStatus[] = ['Pending', 'In Progress', 'Completed', 'Archived', 'Overdue'];
@@ -158,13 +159,7 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
   };
 
   if (loading) {
-    return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="text-center py-8">
-          <p className="text-gray-600">Loading tasks...</p>
-        </div>
-      </div>
-    );
+    return <KanbanBoardLoading />;
   }
 
   if (error) {

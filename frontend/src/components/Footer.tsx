@@ -116,7 +116,7 @@ const Footer = () => {
               />
               <div>
                 <p className="text-sm font-semibold text-gray-800">{authorName}</p>
-                <p className="text-xs text-gray-600">Software Developer</p>
+                <p className="text-xs text-gray-600">Full-stack Developer</p>
               </div>
             </div>
           </div>

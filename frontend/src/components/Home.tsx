@@ -32,17 +32,17 @@ const featureHighlights = [
 // Quick navigation tiles for popular actions.
 const quickNavigation = [
   {
-    label: 'Manage Tasks',
+    label: 'Manage Tasks with List View for better readability',
     description: 'Create, edit, and monitor every task from a single dashboard.',
     to: '/tasks',
   },
   {
-    label: 'Kanban View',
+    label: 'Kanban View board for better visualization',
     description: 'Drag and drop tasks between columns to reflect real-time progress.',
     to: '/view-tasks',
   },
   {
-    label: 'API Testing',
+    label: 'API Testing to verify the backend endpoints',
     description: 'Explore backend endpoints and verify integrations quickly.',
     to: '/api-testing',
   },
@@ -61,7 +61,7 @@ const Home = () => {
             A modern and intuitive task management application designed to help you stay organized and productive.
           </p>
           <p className="text-lg leading-relaxed">
-            This full-stack application is built with React, TypeScript, Express.js, and MySQL, providing a seamless experience for managing your daily tasks and to-do items.
+            This full-stack application is built with Tailwind CSS, React, TypeScript, Express.js, and MySQL serverless, providing a seamless experience for managing your daily tasks and to-do items.
           </p>
           <p className="text-lg leading-relaxed">
             Get started by creating your first task and experience the power of efficient task management!

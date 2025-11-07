@@ -9,6 +9,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import authorPhoto from '../assets/images/thangtruong.jpg';
 
 // Step-by-step procedure for bootstrapping the project locally.
 const projectSetupSteps = [
@@ -189,6 +190,26 @@ const About = () => {
             <li key={tip}>{tip}</li>
           ))}
         </ul>
+      </section>
+
+      {/* Author profile section with photo and summary */}
+      <section className="bg-white rounded-lg shadow-md p-8">
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          <img
+            src={authorPhoto}
+            alt="thangtruong"
+            className="w-40 h-40 rounded-full object-cover border-4 border-blue-100 shadow"
+          />
+          <div className="text-center md:text-left space-y-3">
+            <h2 className="text-2xl font-semibold text-gray-800">Meet Thang.Truong</h2>
+            <p className="text-sm text-gray-600">
+              Full-stack developer behind this Todo List platform, focused on building reliable workflow tools with seamless user experiences.
+            </p>
+            <p className="text-sm text-gray-600">
+              Passionate about Tailwind CSS, TypeScript, React.js, Express.js, MySQL, and crafting thoughtful frontend interactions that keep teams aligned.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Quick links to other helpful pages */}
