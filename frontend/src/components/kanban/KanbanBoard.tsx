@@ -17,6 +17,7 @@ import type { DropResult } from '@hello-pangea/dnd';
 import { toast } from 'react-toastify';
 import { Task, TaskStatus } from '../../types';
 import { getAllTasks, updateTask } from '../../services/taskService';
+import { getMelbourneTime, normalizeToMelbourneIso } from '../../utils/dateUtils';
 import TaskCard from './TaskCard';
 import TaskDetailModal from './TaskDetailModal';
 
@@ -30,8 +31,26 @@ const columnNames: Record<TaskStatus, string> = {
   'Archived': 'Archived',
   'Overdue': 'Overdue',
 };
+// Toast configuration for consistent notifications
+const toastOptions = {
+  position: 'bottom-left' as const,
+  autoClose: 7000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+};
 // Closed statuses that should not move into Overdue directly
 const isClosedStatus = (status: TaskStatus) => status === 'Completed' || status === 'Archived';
+const isActiveStatus = (status: TaskStatus) => status === 'Pending' || status === 'In Progress';
+const hasDueDatePassed = (task: Task): boolean => {
+  const normalized = normalizeToMelbourneIso(task.due_date);
+  if (!normalized) {
+    return false;
+  }
+  const dueDate = new Date(normalized);
+  return !Number.isNaN(dueDate.getTime()) && dueDate.getTime() < getMelbourneTime().getTime();
+};
 
 interface KanbanBoardProps {
   onTaskUpdate?: () => void;
@@ -73,12 +92,10 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
   }, [fetchTasks]);
 
   const getTasksByStatus = (status: TaskStatus): Task[] => tasks.filter((task) => task.status === status);
-  const getTotalTasks = (): number => tasks.length;
   const getStatusPercentage = (status: TaskStatus): number => {
-    const totalTasks = getTotalTasks();
-    if (totalTasks === 0) return 0;
+    if (tasks.length === 0) return 0;
     const statusTasks = getTasksByStatus(status);
-    return (statusTasks.length / totalTasks) * 100;
+    return (statusTasks.length / tasks.length) * 100;
   };
 
   const handleDragEnd = useCallback(async (result: DropResult) => {
@@ -101,42 +118,35 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
     if (task.status === newStatus) {
       return;
     }
-    if (newStatus === 'Overdue' && isClosedStatus(task.status)) {
-      toast.error('Completed or archived tasks cannot be moved to Overdue. Please reopen the task first.', {
-        position: 'bottom-left',
-        autoClose: 7000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+    if (newStatus === 'Overdue') {
+      if (isClosedStatus(task.status)) {
+        toast.error('Completed or archived tasks cannot be moved to Overdue. Please reopen the task first.', toastOptions);
+        return;
+      }
+      if (isActiveStatus(task.status) && !hasDueDatePassed(task)) {
+        toast.error('This task is not overdue yet. Update the due date or wait until it passes before moving it to Overdue.', toastOptions);
+        return;
+      }
+    }
+    if (isClosedStatus(task.status) && isActiveStatus(newStatus) && hasDueDatePassed(task)) {
+      toast.warn('Update the task due date before reopening it to Pending or In Progress.', toastOptions);
+      return;
+    }
+    if (task.status === 'Overdue' && isActiveStatus(newStatus) && hasDueDatePassed(task)) {
+      toast.warn('Update the task due date before returning it to Pending or In Progress.', toastOptions);
       return;
     }
     const updatedTasks = tasks.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t));
     setTasks(updatedTasks);
     try {
       await updateTask(task.id, { status: newStatus });
-      toast.success(`Task "${task.title}" status updated to ${newStatus}`, {
-        position: 'bottom-left',
-        autoClose: 7000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.success(`Task "${task.title}" status updated to ${newStatus}`, toastOptions);
       if (onTaskUpdate) {
         onTaskUpdate();
       }
     } catch (error: unknown) {
       setTasks(tasks);
-      toast.error(getErrorMessage(error, 'Failed to update task status. Please try again.'), {
-        position: 'bottom-left',
-        autoClose: 7000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error(getErrorMessage(error, 'Failed to update task status. Please try again.'), toastOptions);
     }
   }, [tasks, onTaskUpdate]);
 

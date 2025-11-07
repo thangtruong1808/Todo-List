@@ -210,4 +210,9 @@ export const fromMelbourneLocalInputToIso = (localInput?: string): string | unde
   return `${year}-${month}-${day}T${hour}:${minute}:00${offsetSuffix}`;
 };
 
+export const getMelbourneTime = (): Date => {
+  const now = new Date();
+  return new Date(now.toLocaleString('en-US', { timeZone: MELBOURNE_TIMEZONE }));
+};
+
 export { MELBOURNE_TIMEZONE };

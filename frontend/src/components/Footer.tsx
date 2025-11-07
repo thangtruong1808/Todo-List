@@ -35,15 +35,19 @@ const Footer = () => {
 
   // Tech stack - technologies used in the application
   const techStack = [
-    'React',
-    'TypeScript',
-    'Express.js',
-    'MySQL',
-    'Tailwind CSS',
-    'Vite',
-    'React Router DOM',
-    'Axios',
-    'React Hook Form',
+    'React 18.2.0',
+    'TypeScript 5.3.3',
+    'Vite 5.0.8',
+    'Tailwind CSS 3.4.0',
+    'React Router DOM 7.9.5',
+    'Axios 1.6.2',
+    'React Hook Form 7.48.2',
+    '@hello-pangea/dnd 16.2.1',
+    'React Icons 5.5.0',
+    'Express.js 4.18.2',
+    'cors 2.8.5',
+    'dotenv 16.3.1',
+    'mysql2 3.6.5',
   ];
 
   return (
