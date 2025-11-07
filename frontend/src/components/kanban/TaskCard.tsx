@@ -12,6 +12,7 @@
 
 import { Task } from '../../types';
 import { FaCalendarAlt, FaBarcode, FaEye, FaAlignLeft } from 'react-icons/fa';
+import { formatDateInMelbourne } from '../../utils/dateUtils';
 
 interface TaskCardProps {
   task: Task;
@@ -21,13 +22,7 @@ interface TaskCardProps {
 const TaskCard = ({ task, onClick }: TaskCardProps) => {
   // Format date for display
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'No due date';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    return formatDateInMelbourne(dateString);
   };
 
   // Get status badge color

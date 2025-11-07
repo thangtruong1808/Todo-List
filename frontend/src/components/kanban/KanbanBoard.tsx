@@ -11,7 +11,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { isAxiosError } from 'axios';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
 import { toast } from 'react-toastify';
 import { Task, TaskStatus } from '../../types';
 import { getAllTasks, updateTask } from '../../services/taskService';
@@ -35,6 +37,17 @@ interface KanbanBoardProps {
   selectedStatuses?: TaskStatus[];
 }
 
+const getErrorMessage = (error: unknown, fallbackMessage: string): string => {
+  if (isAxiosError<{ error?: string }>(error)) {
+    const serverMessage = error.response?.data?.error;
+    return serverMessage ?? error.message ?? fallbackMessage;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return fallbackMessage;
+};
+
 const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanBoardProps) => {
   // State for tasks
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -46,23 +59,23 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Fetch tasks from API
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await getAllTasks();
       setTasks(data);
-    } catch (err: any) {
-      setError('Failed to fetch tasks. Please try again.');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Failed to fetch tasks. Please try again.'));
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Fetch tasks on component mount
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [fetchTasks]);
 
   // Get tasks for a specific status column
   const getTasksByStatus = (status: TaskStatus): Task[] => {
@@ -137,10 +150,10 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
       if (onTaskUpdate) {
         onTaskUpdate();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Revert optimistic update on error
       setTasks(tasks);
-      toast.error(error.response?.data?.error || 'Failed to update task status. Please try again.', {
+      toast.error(getErrorMessage(error, 'Failed to update task status. Please try again.'), {
         position: 'bottom-left',
         autoClose: 7000,
         hideProgressBar: false,

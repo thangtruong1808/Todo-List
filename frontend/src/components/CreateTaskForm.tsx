@@ -14,6 +14,7 @@
 import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { isAxiosError } from 'axios';
 import { createTask, updateTask } from '../services/taskService';
 import { Task, TaskFormData } from '../types';
 import TitleField from './formFields/TitleField';
@@ -23,6 +24,18 @@ import DueDateField from './formFields/DueDateField';
 import DescriptionField from './formFields/DescriptionField';
 import FormHeader from './formFields/FormHeader';
 import FormSubmitButton from './formFields/FormSubmitButton';
+import { fromMelbourneLocalInputToIso, toMelbourneDateTimeLocal } from '../utils/dateUtils';
+
+const getErrorMessage = (error: unknown, fallbackMessage: string): string => {
+  if (isAxiosError<{ error?: string }>(error)) {
+    const serverMessage = error.response?.data?.error;
+    return serverMessage ?? error.message ?? fallbackMessage;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return fallbackMessage;
+};
 
 interface CreateTaskFormProps {
   onTaskCreated: () => void;
@@ -50,16 +63,11 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
   // Populate form when editing task
   useEffect(() => {
     if (editingTask) {
-      // Format due_date for datetime-local input
-      const dueDate = editingTask.due_date
-        ? new Date(editingTask.due_date).toISOString().slice(0, 16)
-        : '';
-
       setValue('title', editingTask.title);
       setValue('description', editingTask.description || '');
       setValue('status', editingTask.status);
       setValue('taskcode', editingTask.taskcode);
-      setValue('due_date', dueDate);
+      setValue('due_date', toMelbourneDateTimeLocal(editingTask.due_date));
     } else {
       // Reset form when not editing
       reset({
@@ -94,7 +102,7 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
           description: data.description || undefined,
           status: data.status,
           taskcode: data.taskcode.toUpperCase(),
-          due_date: data.due_date,
+          due_date: fromMelbourneLocalInputToIso(data.due_date),
         });
         toast.success(`Task has been successfully updated. ID=${updatedTask.id}, Title="${updatedTask.title}"`, {
           position: 'bottom-left',
@@ -111,7 +119,7 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
           description: data.description || undefined,
           status: data.status,
           taskcode: data.taskcode.toUpperCase(),
-          due_date: data.due_date,
+          due_date: fromMelbourneLocalInputToIso(data.due_date),
         });
         toast.success(`Task has been successfully created. ID=${newTask.id}, Title="${newTask.title}"`, {
           position: 'bottom-left',
@@ -127,8 +135,8 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
       if (onCancelEdit) {
         onCancelEdit();
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || `Failed to ${editingTask ? 'update' : 'create'} task. Please try again.`, {
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, `Failed to ${editingTask ? 'update' : 'create'} task. Please try again.`), {
         position: 'bottom-left',
         autoClose: 7000,
         hideProgressBar: false,

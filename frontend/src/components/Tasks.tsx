@@ -45,12 +45,16 @@ const Tasks = () => {
   return (
     <div className="max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Tasks Management</h1>
-      <CreateTaskForm
-        onTaskCreated={handleTaskCreated}
-        editingTask={editingTask}
-        onCancelEdit={handleCancelEdit}
-      />
-      <TasksTable refreshKey={refreshKey} onEditTask={handleEditTask} />
+      <div className="max-w-5xl w-full">
+        <CreateTaskForm
+          onTaskCreated={handleTaskCreated}
+          editingTask={editingTask}
+          onCancelEdit={handleCancelEdit}
+        />
+      </div>
+      <div className="mt-8">
+        <TasksTable refreshKey={refreshKey} onEditTask={handleEditTask} />
+      </div>
     </div>
   );
 };
