@@ -16,7 +16,7 @@ export const getAllTasks = async (req: Request, res: Response) => {
     const tasks = await taskService.getAllTasks();
     res.json(tasks);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal server error', message: error.message });
+    res.status(500).json({ error: 'Sorry, something went wrong on our end.', message: error.message });
   }
 };
 
@@ -35,7 +35,7 @@ export const getTaskById = async (req: Request, res: Response) => {
     }
     res.json(task);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal server error', message: error.message });
+    res.status(500).json({ error: 'Sorry, something went wrong on our end.', message: error.message });
   }
 };
 
@@ -66,7 +66,7 @@ export const createTask = async (req: Request, res: Response) => {
 
     res.status(201).json(task);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal server error', message: error.message });
+    res.status(500).json({ error: 'Sorry, something went wrong on our end.', message: error.message });
   }
 };
 
@@ -97,7 +97,7 @@ export const updateTask = async (req: Request, res: Response) => {
     }
     res.json(task);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal server error', message: error.message });
+    res.status(500).json({ error: 'Sorry, something went wrong on our end.', message: error.message });
   }
 };
 
@@ -116,7 +116,7 @@ export const deleteTask = async (req: Request, res: Response) => {
     }
     res.json({ message: 'Task deleted successfully' });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal server error', message: error.message });
+    res.status(500).json({ error: 'Sorry, something went wrong on our end.', message: error.message });
   }
 };
 

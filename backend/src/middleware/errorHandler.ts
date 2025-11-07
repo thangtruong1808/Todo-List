@@ -17,7 +17,7 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   res.status(500).json({
-    error: 'Internal server error',
+    error: 'Sorry, something went wrong on our end.',
     message: err.message,
   });
 };

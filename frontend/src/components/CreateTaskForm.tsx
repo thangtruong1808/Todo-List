@@ -148,9 +148,9 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div className="bg-white rounded-lg shadow-md p-5 mb-5">
       <FormHeader editingTask={editingTask} onCancelEdit={handleCancelEdit} />
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         {/* First Row: Title and Task Code */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TitleField

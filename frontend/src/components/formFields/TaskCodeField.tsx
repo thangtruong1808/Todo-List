@@ -57,14 +57,13 @@ const TaskCodeField = ({ register, errors, touchedFields, watchedFields }: TaskC
             const target = e.target as HTMLInputElement;
             target.value = target.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
           }}
-          className={`w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase ${
-            errors.taskcode
-              ? 'border-red-500'
-              : touchedFields.taskcode && !errors.taskcode && watchedFields.taskcode?.length === 5 && /^[A-Z0-9]{5}$/.test(watchedFields.taskcode)
+          className={`w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500  ${errors.taskcode
+            ? 'border-red-500'
+            : touchedFields.taskcode && !errors.taskcode && watchedFields.taskcode?.length === 5 && /^[A-Z0-9]{5}$/.test(watchedFields.taskcode)
               ? 'border-green-500'
               : 'border-gray-300'
-          }`}
-          placeholder="A0001"
+            }`}
+          placeholder="Enter task code"
           maxLength={5}
         />
         {touchedFields.taskcode && !errors.taskcode && watchedFields.taskcode?.length === 5 && /^[A-Z0-9]{5}$/.test(watchedFields.taskcode) && (
