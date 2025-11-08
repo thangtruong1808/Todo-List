@@ -16,7 +16,7 @@ const dbPassword = process.env.DB_PASSWORD && process.env.DB_PASSWORD.trim() !==
   ? process.env.DB_PASSWORD.trim() 
   : undefined; // Database password 
 const dbName = process.env.DB_NAME!.trim(); // Target schema
-export const DB_TIME_ZONE = process.env.DB_TIMEZONE?.trim() || 'Australia/Melbourne'; // Database server timezone
+export const DB_TIME_ZONE = process.env.DB_TIMEZONE?.trim() || 'UTC'; // Database server timezone (defaults to UTC)
 
 const dbPortRaw = process.env.DB_PORT!.trim(); // Port string to parse
 const dbPort = Number(dbPortRaw);
