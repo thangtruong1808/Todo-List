@@ -200,7 +200,8 @@ const formatDateInZone = (date: Date, timeZone: string): string | undefined => {
 };
 
 const convertZoneString = (value: string, fromZone: string, toZone: string): string | undefined => {
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
+  const sanitized = value.replace('T', ' ');
+  const match = sanitized.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
   if (!match) {
     return value;
   }
