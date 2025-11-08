@@ -19,10 +19,10 @@ const Footer = () => {
   const appDescription = 'A modern and intuitive task management application designed to help you stay organized and productive.';
 
   // Author information from environment variables - social media links
-  const authorName = import.meta.env.VITE_AUTHOR_NAME || '';
-  const linkedinUrl = import.meta.env.VITE_AUTHOR_LINKEDIN_URL || '#';
-  const githubUrl = import.meta.env.VITE_AUTHOR_GITHUB_URL || '#';
-  const facebookUrl = import.meta.env.VITE_AUTHOR_FACEBOOK_URL || '#';
+  const authorName = import.meta.env.VITE_DEVELOPER_NAME || '';
+  const linkedinUrl = import.meta.env.VITE_DEVELOPER_LINKEDIN_URL || '#';
+  const githubUrl = import.meta.env.VITE_DEVELOPER_GITHUB_URL || '#';
+  const facebookUrl = import.meta.env.VITE_DEVELOPER_FACEBOOK_URL || '#';
 
   // Navigation items for quick links - footer navigation menu
   const quickLinks = [
