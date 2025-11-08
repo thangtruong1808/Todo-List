@@ -1,12 +1,5 @@
 /**
- * CreateTaskForm Component
- * 
- * Description: Main form component for creating and editing tasks.
- *              Uses React Hook Form for form validation and management.
- *              Supports both create and edit modes based on editingTask prop.
- *              Composed of smaller field components for better maintainability.
- *              Displays toast notifications for success and error states.
- * 
+ * Description: Task creation/edit form with validation and toast feedback.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
@@ -14,7 +7,6 @@
 import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { isAxiosError } from 'axios';
 import { createTask, updateTask } from '../services/taskService';
 import { Task, TaskFormData } from '../types';
 import TitleField from './formFields/TitleField';
@@ -25,17 +17,7 @@ import DescriptionField from './formFields/DescriptionField';
 import FormHeader from './formFields/FormHeader';
 import FormSubmitButton from './formFields/FormSubmitButton';
 import { fromMelbourneLocalInputToIso, toMelbourneDateTimeLocal } from '../utils/dateUtils';
-
-const getErrorMessage = (error: unknown, fallbackMessage: string): string => {
-  if (isAxiosError<{ error?: string }>(error)) {
-    const serverMessage = error.response?.data?.error;
-    return serverMessage ?? error.message ?? fallbackMessage;
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return fallbackMessage;
-};
+import { getErrorMessage } from '../utils/errorUtils';
 
 interface CreateTaskFormProps {
   onTaskCreated: () => void;
@@ -57,10 +39,10 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
     },
   });
 
-  // Watch field values for validation check
+  // Track live field values
   const watchedFields = watch();
 
-  // Populate form when editing task
+  // Load edit context or reset defaults
   useEffect(() => {
     if (editingTask) {
       setValue('title', editingTask.title);
@@ -69,16 +51,14 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
       setValue('taskcode', editingTask.taskcode);
       setValue('due_date', toMelbourneDateTimeLocal(editingTask.due_date));
     } else {
-      // Reset form when not editing
       reset({
         status: 'Pending',
       });
     }
   }, [editingTask, setValue, reset]);
 
-  // Handle cancel edit
+  // Exit edit mode
   const handleCancelEdit = () => {
-    // Reset all form fields to default values
     reset({
       title: '',
       description: '',
@@ -86,17 +66,15 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
       taskcode: '',
       due_date: '',
     });
-    // Call parent cancel handler
     if (onCancelEdit) {
       onCancelEdit();
     }
   };
 
-  // Handle form submission
+  // Persist task changes
   const onSubmit = async (data: TaskFormData) => {
     try {
       if (editingTask && editingTask.id) {
-        // Update existing task
         const updatedTask = await updateTask(editingTask.id, {
           title: data.title.trim(),
           description: data.description || undefined,
@@ -113,7 +91,6 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
           draggable: true,
         });
       } else {
-        // Create new task
         const newTask = await createTask({
           title: data.title.trim(),
           description: data.description || undefined,
@@ -151,7 +128,7 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
     <div className="bg-white rounded-lg shadow-md p-5 mb-5">
       <FormHeader editingTask={editingTask} onCancelEdit={handleCancelEdit} />
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-        {/* First Row: Title and Task Code */}
+        {/* Row 1: Title & Code */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TitleField
             register={register}
@@ -168,7 +145,7 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
           />
         </div>
 
-        {/* Second Row: Status and Due Date */}
+        {/* Row 2: Status & Due Date */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <StatusField
             register={register}
@@ -184,14 +161,14 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
           />
         </div>
 
-        {/* Description Field - Full Width */}
+        {/* Row 3: Description */}
         <DescriptionField
           register={register}
           touchedFields={touchedFields}
           watchedFields={watchedFields}
         />
 
-        {/* Submit Button */}
+        {/* Row 4: Submit */}
         <FormSubmitButton isSubmitting={isSubmitting} editingTask={editingTask} />
       </form>
     </div>

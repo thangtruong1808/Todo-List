@@ -1,9 +1,5 @@
 /**
- * Database Configuration
- * 
- * Description: MySQL database connection pool configuration using environment variables.
- *              Handles database connection settings for local or remote MySQL databases.
- * 
+ * Description: MySQL connection pool configuration sourced from environment variables.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
@@ -11,27 +7,32 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config(); // Load .env values into process.env
 
-// Database connection configuration
-// If DB_PASSWORD is not set or is empty string, use undefined (no password)
-// Otherwise use the provided password value
+const dbHost = process.env.DB_HOST!.trim(); // Database host name / IP
+const dbUser = process.env.DB_USER!.trim(); // Database user credential
+// const dbPassword = process.env.DB_PASSWORD!.trim(); // Database password credential
 const dbPassword = process.env.DB_PASSWORD && process.env.DB_PASSWORD.trim() !== '' 
   ? process.env.DB_PASSWORD.trim() 
-  : undefined;
+  : undefined; // Database password 
+const dbName = process.env.DB_NAME!.trim(); // Target schema
 
-// Database connection pool configuration
-// Default values match XAMPP MySQL setup: localhost, root user, no password, port 3308
+const dbPortRaw = process.env.DB_PORT!.trim(); // Port string to parse
+const dbPort = Number(dbPortRaw);
+if (Number.isNaN(dbPort)) {
+  throw new Error('[Database Config] DB_PORT must be a valid number.'); // Guard invalid port
+}
+
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
+  host: dbHost,
+  user: dbUser,
   password: dbPassword,
-  database: process.env.DB_NAME || 'todoList_db',
-  port: parseInt(process.env.DB_PORT || '3308', 10),
+  database: dbName,
+  port: dbPort,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
 });
 
-export default pool;
+export default pool; // Shared connection pool across backend
 

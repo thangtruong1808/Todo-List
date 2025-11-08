@@ -1,82 +1,109 @@
 /**
- * API Testing Component
- * 
  * Description: API Testing page component that guides users on how to test API endpoints.
- *              Implementation will be added later.
- * 
+ * Uses environment variables for API endpoints and tool URLs to ensure flexibility.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
 
 import { useMemo } from 'react';
 
-// List of tools that can be used to exercise the backend APIs.
+const postmanUrl = import.meta.env.VITE_POSTMAN_URL || '#'; // Postman download page (fallback when env missing)
+const insomniaUrl = import.meta.env.VITE_INSOMNIA_URL || '#'; // Insomnia download page (fallback when env missing)
+const curlUrl = import.meta.env.VITE_CURL_URL || '#'; // cURL download page (fallback when env missing)
+
+// Tool options for exercising backend APIs.
 const apiTools = [
   {
     name: 'Postman',
     description: 'Import the collection and send authenticated requests with ease.',
-    url: 'https://www.postman.com/downloads/',
+    url: postmanUrl,
   },
   {
     name: 'Insomnia',
     description: 'Lightweight REST client with environment support and scripting.',
-    url: 'https://insomnia.rest/download',
+    url: insomniaUrl,
   },
   {
     name: 'cURL (CLI)',
     description: 'Great for quick testing from the terminal or CI pipelines.',
-    url: 'https://curl.se/download.html',
+    url: curlUrl,
   },
 ];
 
-// Common headers required when hitting authenticated endpoints.
+// Standard headers for JSON requests.
 const defaultHeaders = [
   { key: 'Content-Type', value: 'application/json' },
   { key: 'Accept', value: 'application/json' },
 ];
 
 const APITesting = () => {
-  // Compute sample requests once to avoid re-creation on re-render.
+  const getAllTasksUrl = import.meta.env.VITE_GET_ALL_TASK || '#'; // Endpoint to fetch all tasks
+  const getTaskByIdUrl = import.meta.env.VITE_GET_A_TASK_ID || '#'; // Endpoint to retrieve task by ID
+  const createTaskUrl = import.meta.env.VITE_POST_A_TASK || '#'; // Endpoint to create new task
+  const updateTaskUrl = import.meta.env.VITE_PUT_A_TASK_ID || '#'; // Endpoint to update task by ID
+  const deleteTaskUrl = import.meta.env.VITE_DELETE_A_TASK_ID || '#'; // Endpoint to delete task by ID
+
+  // Prepare illustrative request snippets.
   const sampleRequests = useMemo(
     () => [
       {
+        // POST /tasks example
         title: 'Create a Task',
         method: 'POST',
-        path: '/api/tasks',
-        body: JSON.stringify({
-          title: 'New Task',
-          taskcode: 'A1234',
-          description: 'Optional task description',
-          status: 'Pending',
-          due_date: new Date().toISOString(),
-        }, null, 2),
-        description: 'Creates a new task record with the provided details.',
+        path: createTaskUrl,
+        body: JSON.stringify(
+          {
+            title: 'This is a sample Test Task 1',
+            description: 'This is a sample test task description 1',
+            status: 'Pending',
+            taskcode: 'TT001',
+            due_date: '2025-12-31T23:59:59',
+          },
+          null,
+          2,
+        ),
+        description: 'Creates a new task record with predefined demo values.',
       },
       {
+        // GET /tasks example
         title: 'List All Tasks',
         method: 'GET',
-        path: '/api/tasks',
+        path: getAllTasksUrl,
         body: undefined,
         description: 'Returns an array of all tasks stored in the database.',
       },
       {
-        title: 'Update Task Status',
-        method: 'PUT',
-        path: '/api/tasks/:id',
-        body: JSON.stringify({
-          status: 'In Progress',
-        }, null, 2),
-        description: 'Update the status of a task by replacing :id with the task ID.',
+        // GET /tasks/:id example
+        title: 'Get Task By ID',
+        method: 'GET',
+        path: getTaskByIdUrl,
+        body: undefined,
+        description: 'Retrieve the task with ID 1 for inspection.',
       },
       {
+        // PUT /tasks/:id example
+        title: 'Update Task Status',
+        method: 'PUT',
+        path: updateTaskUrl,
+        body: JSON.stringify(
+          {
+            status: 'In Progress',
+          },
+          null,
+          2,
+        ),
+        description: 'Update the status of task ID 1 to "In Progress".',
+      },
+      {
+        // DELETE /tasks/:id example
         title: 'Delete a Task',
         method: 'DELETE',
-        path: '/api/tasks/:id',
+        path: deleteTaskUrl,
         body: undefined,
-        description: 'Remove a task permanently. Replace :id with the target task ID.',
+        description: 'Remove the task with ID 1 from the database.',
       },
     ],
-    [],
+    [createTaskUrl, getAllTasksUrl, getTaskByIdUrl, updateTaskUrl, deleteTaskUrl],
   );
 
   return (
@@ -88,7 +115,7 @@ const APITesting = () => {
           Use the sections below to explore backend endpoints with your favorite API client.
         </p>
       </div>
- 
+
       {/* Tool suggestions to help testers get started */}
       <section className="bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Recommended Tools</h2>
@@ -108,7 +135,7 @@ const APITesting = () => {
           ))}
         </div>
       </section>
- 
+
       {/* Default headers to include in requests */}
       <section className="bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Request Headers</h2>
@@ -131,7 +158,7 @@ const APITesting = () => {
           </table>
         </div>
       </section>
- 
+
       {/* Sample requests with method, path, and payload */}
       <section className="bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Sample Requests</h2>
@@ -151,9 +178,9 @@ const APITesting = () => {
                 <pre className="whitespace-pre-wrap break-words">{`fetch('${sample.path}', {
   method: '${sample.method}',
   headers: ${JSON.stringify(defaultHeaders.reduce((acc, header) => ({
-    ...acc,
-    [header.key]: header.value,
-  }), {}), null, 2)},${sample.body ? `
+                  ...acc,
+                  [header.key]: header.value,
+                }), {}), null, 2)},${sample.body ? `
   body: ${sample.body},` : ''}
 });`}</pre>
               </div>
@@ -161,7 +188,7 @@ const APITesting = () => {
           ))}
         </div>
       </section>
- 
+
       {/* Tips to ensure successful testing sessions */}
       <section className="bg-blue-50 rounded-lg border border-blue-100 p-8">
         <h2 className="text-2xl font-semibold text-blue-900 mb-3">Testing Tips</h2>

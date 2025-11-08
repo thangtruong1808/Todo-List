@@ -1,9 +1,5 @@
 /**
- * About Component
- * 
- * Description: About page component that displays information about the application.
- *              Implementation will be added later.
- * 
+ * Description: About page showcasing setup steps, contribution tips, and author bio.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
@@ -11,12 +7,31 @@
 import { Link } from 'react-router-dom';
 import authorPhoto from '../assets/images/thangtruong.jpg';
 
-// Step-by-step procedure for bootstrapping the project locally.
+const githubUrl = import.meta.env.VITE_AUTHOR_GITHUB_URL || '#'; // GitHub repository link
+const repositoryCommand =
+  githubUrl === '#'
+    ? 'git clone https://github.com/your-org/todo-list.git && cd todo-list'
+    : (
+      <>
+        git clone{' '}
+        <a
+          href={githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline underline-offset-2"
+        >
+          {githubUrl}
+        </a>{' '}
+        && cd todo-list
+      </>
+    ); // Clone command with clickable repository URL
+
+// Setup steps for local onboarding.
 const projectSetupSteps = [
   {
     title: 'Clone the repository',
     description: 'Use git clone or download the project archive to your machine.',
-    command: 'git clone https://github.com/your-org/todo-list.git && cd todo-list',
+    command: repositoryCommand,
   },
   {
     title: 'Install dependencies',
@@ -41,7 +56,7 @@ cp backend/.env.example backend/.env`,
   },
 ];
 
-// Additional tips to keep contributions consistent.
+// Tips to align contributions.
 const contributionTips = [
   'Follow the established TypeScript and ESLint guidelines before committing changes.',
   'Ensure tasks are tested in both table and Kanban views to catch regressions early.',
@@ -49,101 +64,10 @@ const contributionTips = [
   'Use descriptive pull request titles summarizing the feature or fix.',
 ];
 
-// Project structure overview mirroring the repository layout.
-const projectStructureLines = [
-  'Todo-List/',
-  '├── API_TESTING_GUIDE.md',
-  '├── backend/',
-  '│   ├── env.example',
-  '│   ├── nodemon.json',
-  '│   ├── package-lock.json',
-  '│   ├── package.json',
-  '│   ├── src/',
-  '│   │   ├── config/',
-  '│   │   │   └── database.ts',
-  '│   │   ├── controllers/',
-  '│   │   │   └── todo.controller.ts',
-  '│   │   ├── database/',
-  '│   │   │   └── schema.sql',
-  '│   │   ├── middleware/',
-  '│   │   │   └── errorHandler.ts',
-  '│   │   ├── models/',
-  '│   │   │   └── todo.model.ts',
-  '│   │   ├── routes/',
-  '│   │   │   └── todo.routes.ts',
-  '│   │   ├── services/',
-  '│   │   │   └── todo.service.ts',
-  '│   │   └── server.ts',
-  '│   └── tsconfig.json',
-  '├── frontend/',
-  '│   ├── index.html',
-  '│   ├── package-lock.json',
-  '│   ├── package.json',
-  '│   ├── postcss.config.js',
-  '│   ├── env.example',
-  '│   ├── public/',
-  '│   │   └── images/',
-  '│   ├── src/',
-  '│   │   ├── App.tsx',
-  '│   │   ├── assets/',
-  '│   │   │   └── images/',
-  '│   │   │       └── thangtruong.jpg',
-  '│   │   ├── components/',
-  '│   │   │   ├── About.tsx',
-  '│   │   │   ├── APITesting.tsx',
-  '│   │   │   ├── CreateTaskForm.tsx',
-  '│   │   │   ├── Footer.tsx',
-  '│   │   │   ├── Home.tsx',
-  '│   │   │   ├── NavBar.tsx',
-  '│   │   │   ├── Tasks.tsx',
-  '│   │   │   ├── TasksTable.tsx',
-  '│   │   │   ├── ViewTasks.tsx',
-  '│   │   │   ├── formFields/',
-  '│   │   │   │   ├── DescriptionField.tsx',
-  '│   │   │   │   ├── DueDateField.tsx',
-  '│   │   │   │   ├── FormHeader.tsx',
-  '│   │   │   │   ├── FormSubmitButton.tsx',
-  '│   │   │   │   ├── StatusField.tsx',
-  '│   │   │   │   ├── TaskCodeField.tsx',
-  '│   │   │   │   └── TitleField.tsx',
-  '│   │   │   ├── kanban/',
-  '│   │   │   │   ├── KanbanBoard.tsx',
-  '│   │   │   │   ├── StatusFilter.tsx',
-  '│   │   │   │   ├── TaskCard.tsx',
-  '│   │   │   │   └── TaskDetailModal.tsx',
-  '│   │   │   └── tasksTable/',
-  '│   │   │       ├── DeleteTaskModal.tsx',
-  '│   │   │       ├── TasksTableEmpty.tsx',
-  '│   │   │       ├── TasksTableError.tsx',
-  '│   │   │       ├── TasksTableGrid.tsx',
-  '│   │   │       ├── TasksTableHeader.tsx',
-  '│   │   │       ├── TasksTableLoading.tsx',
-  '│   │   │       ├── TasksTablePagination.tsx',
-  '│   │   │       └── utils.ts',
-  '│   │   ├── hooks/',
-  '│   │   ├── index.css',
-  '│   │   ├── main.tsx',
-  '│   │   ├── services/',
-  '│   │   │   ├── api.ts',
-  '│   │   │   └── taskService.ts',
-  '│   │   ├── types/',
-  '│   │   │   └── index.ts',
-  '│   │   ├── utils/',
-  '│   │   │   └── dateUtils.ts',
-  '│   │   └── vite-env.d.ts',
-  '│   ├── tailwind.config.js',
-  '│   ├── tsconfig.json',
-  '│   ├── tsconfig.node.json',
-  '│   └── vite.config.ts',
-  '├── package-lock.json',
-  '├── package.json',
-  '└── README.md',
-];
-
 const About = () => {
   return (
     <div className="max-w-5xl mx-auto space-y-10">
-      {/* Introduction to the project setup guide */}
+      {/* Intro summary */}
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
         <h1 className="text-4xl font-bold text-gray-800 mb-3">Build the Todo List Project Locally</h1>
         <p className="text-gray-600">
@@ -151,7 +75,7 @@ const About = () => {
         </p>
       </div>
 
-      {/* Step-by-step setup instructions */}
+      {/* Setup checklist */}
       <section className="bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Project Setup Steps</h2>
         <ol className="space-y-6">
@@ -174,15 +98,7 @@ const About = () => {
         </ol>
       </section>
 
-      {/* Project structure reference */}
-      <section className="bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Project Structure</h2>
-        <div className="bg-gray-50 rounded-md p-4 text-sm font-mono text-gray-700 whitespace-pre">
-          {projectStructureLines.join('\n')}
-        </div>
-      </section>
-
-      {/* Contribution guidelines and best practices */}
+      {/* Contribution tips */}
       <section className="bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Contribution Guidelines</h2>
         <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
@@ -192,7 +108,7 @@ const About = () => {
         </ul>
       </section>
 
-      {/* Author profile section with photo and summary */}
+      {/* Author spotlight */}
       <section className="bg-white rounded-lg shadow-md p-8">
         <div className="flex flex-col md:flex-row items-center gap-6">
           <img
@@ -212,7 +128,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Quick links to other helpful pages */}
+      {/* Quick navigation */}
       <section className="bg-blue-50 rounded-lg border border-blue-100 p-8 text-center">
         <h2 className="text-2xl font-semibold text-blue-900 mb-3">Need more details?</h2>
         <p className="text-blue-800 mb-6">Visit the sections below to explore APIs or manage tasks once setup is complete.</p>

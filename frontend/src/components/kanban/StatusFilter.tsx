@@ -1,10 +1,5 @@
 /**
- * StatusFilter Component
- *
- * Description: Filter component for task statuses with checkboxes.
- *              Allows users to filter tasks by status in the Kanban board.
- *              Displays all available statuses as checkboxes.
- *
+ * Description: Status filter checkbox group supporting select all toggles.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
@@ -12,7 +7,7 @@
 import { TaskStatus } from '../../types';
 import { FaFilter } from 'react-icons/fa';
 
-// Status options - available task status values for filtering
+// Available task statuses
 const statusOptions: TaskStatus[] = ['Pending', 'In Progress', 'Completed', 'Archived', 'Overdue'];
 
 interface StatusFilterProps {
@@ -21,24 +16,20 @@ interface StatusFilterProps {
 }
 
 const StatusFilter = ({ selectedStatuses, onStatusChange }: StatusFilterProps) => {
-  // Handle checkbox change
+  // Toggle a specific status
   const handleStatusToggle = (status: TaskStatus) => {
     if (selectedStatuses.includes(status)) {
-      // Remove status if already selected
       onStatusChange(selectedStatuses.filter((s) => s !== status));
     } else {
-      // Add status if not selected
       onStatusChange([...selectedStatuses, status]);
     }
   };
 
-  // Handle select all
+  // Toggle select all state
   const handleSelectAll = () => {
     if (selectedStatuses.length === statusOptions.length) {
-      // Deselect all
       onStatusChange([]);
     } else {
-      // Select all
       onStatusChange([...statusOptions]);
     }
   };

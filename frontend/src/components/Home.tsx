@@ -1,15 +1,12 @@
 /**
- * Home Component
- * 
- * Description: Home page component that welcomes users and highlights key app benefits.
- * 
+ * Description: Landing page summarizing benefits and navigation shortcuts.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
 
 import { Link } from 'react-router-dom';
 
-// Feature cards presented below the hero section.
+// Feature highlights for hero
 const featureHighlights = [
   {
     title: 'Stay Organized Effortlessly',
@@ -29,7 +26,7 @@ const featureHighlights = [
   },
 ];
 
-// Quick navigation tiles for popular actions.
+// Quick navigation targets
 const quickNavigation = [
   {
     label: 'Manage Tasks with List View for better readability',
@@ -51,7 +48,7 @@ const quickNavigation = [
 const Home = () => {
   return (
     <div className="max-w-6xl mx-auto space-y-10">
-      {/* Hero introduction highlighting key messaging */}
+      {/* Hero summary */}
       <div className="bg-white rounded-lg shadow-md p-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center">
           Welcome to Todo List App
@@ -69,7 +66,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Feature highlight cards summarizing product strengths */}
+      {/* Feature highlights */}
       <section className="bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Why teams choose this workspace</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -82,7 +79,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Quick navigation tiles linking to key app areas */}
+      {/* Quick navigation */}
       <section className="bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Jump back into work</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -102,7 +99,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Call-to-action prompting users to manage tasks */}
+      {/* Call-to-action */}
       <section className="bg-blue-50 rounded-lg border border-blue-100 p-8 text-center">
         <h2 className="text-2xl font-semibold text-blue-900 mb-3">Ready to streamline your workflow?</h2>
         <p className="text-blue-800 mb-6">

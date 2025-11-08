@@ -1,12 +1,5 @@
 /**
- * Tasks Component
- * 
- * Description: Tasks page component for creating, editing, and managing tasks.
- *              Integrates CreateTaskForm and TasksTable components.
- *              Manages state for editing task and coordinates between form and table.
- *              Provides functionality to create new tasks, edit existing tasks, and view all tasks with pagination.
- *              Automatically scrolls to form when edit button is clicked.
- * 
+ * Description: Tasks page container managing form and table interactions.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
@@ -17,27 +10,24 @@ import TasksTable from './TasksTable';
 import { Task } from '../types';
 
 const Tasks = () => {
-  // State to trigger table refresh
+  // Refresh token for table fetch
   const [refreshKey, setRefreshKey] = useState<number>(0);
-  // State for editing task
+  // Currently edited task
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  // Handle task created/updated callback
+  // Refresh listings and clear edit state
   const handleTaskCreated = () => {
-    // Increment refresh key to trigger table refresh
     setRefreshKey((prev) => prev + 1);
-    // Clear editing task
     setEditingTask(null);
   };
 
-  // Handle edit task
+  // Activate edit mode
   const handleEditTask = (task: Task) => {
     setEditingTask(task);
-    // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handle cancel edit
+  // Cancel edit mode
   const handleCancelEdit = () => {
     setEditingTask(null);
   };
@@ -46,6 +36,7 @@ const Tasks = () => {
     <div className="max-w-8xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Tasks Management</h1>
       <div className="max-w-8xl w-full">
+        {/* Task form */}
         <CreateTaskForm
           onTaskCreated={handleTaskCreated}
           editingTask={editingTask}
@@ -53,6 +44,7 @@ const Tasks = () => {
         />
       </div>
       <div className="mt-8">
+        {/* Task table */}
         <TasksTable refreshKey={refreshKey} onEditTask={handleEditTask} />
       </div>
     </div>

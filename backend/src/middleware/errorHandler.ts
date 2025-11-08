@@ -1,9 +1,5 @@
 /**
- * Error Handler Middleware
- * 
- * Description: Global error handling middleware for Express.
- *              Catches and handles all unhandled errors in the application.
- * 
+ * Description: Express middleware to centralize uncaught error responses.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
@@ -17,8 +13,7 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   res.status(500).json({
-    error: 'Sorry, something went wrong on our end.',
-    message: err.message,
+    error: 'Sorry, something went wrong on our end.', // User-facing message
+    message: err.message, // Developer-friendly detail
   });
 };
-

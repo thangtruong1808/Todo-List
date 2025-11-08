@@ -1,9 +1,5 @@
 /**
- * Todo Routes
- * 
- * Description: Express router for task API endpoints.
- *              Defines all HTTP routes for task operations (CRUD).
- * 
+ * Description: Express router wiring HTTP verbs to todo controller handlers.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
@@ -13,19 +9,19 @@ import * as taskController from '../controllers/todo.controller';
 
 const router = Router();
 
-// GET all tasks
+// GET /api/tasks → list tasks
 router.get('/', taskController.getAllTasks);
 
-// GET task by id
+// GET /api/tasks/:id → show task
 router.get('/:id', taskController.getTaskById);
 
-// POST create task
+// POST /api/tasks → create task
 router.post('/', taskController.createTask);
 
-// PUT update task
+// PUT /api/tasks/:id → update task
 router.put('/:id', taskController.updateTask);
 
-// DELETE task
+// DELETE /api/tasks/:id → remove task
 router.delete('/:id', taskController.deleteTask);
 
 export default router;

@@ -1,9 +1,5 @@
 /**
- * Todo Controller
- * 
- * Description: Handles HTTP requests for task operations (CRUD).
- *              Validates input data and delegates business logic to task service.
- * 
+ * Description: Express handlers orchestrating CRUD workflows for todo tasks.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
@@ -11,6 +7,7 @@
 import { Request, Response } from 'express';
 import { taskService } from '../services/todo.service';
 
+// GET /tasks → return all tasks
 export const getAllTasks = async (req: Request, res: Response) => {
   try {
     const tasks = await taskService.getAllTasks();
@@ -20,6 +17,7 @@ export const getAllTasks = async (req: Request, res: Response) => {
   }
 };
 
+// GET /tasks/:id → return a single task
 export const getTaskById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -39,6 +37,7 @@ export const getTaskById = async (req: Request, res: Response) => {
   }
 };
 
+// POST /tasks → create a new task
 export const createTask = async (req: Request, res: Response) => {
   try {
     const { title, description, status, taskcode, due_date } = req.body;
@@ -70,6 +69,7 @@ export const createTask = async (req: Request, res: Response) => {
   }
 };
 
+// PUT /tasks/:id → update an existing task
 export const updateTask = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -101,6 +101,7 @@ export const updateTask = async (req: Request, res: Response) => {
   }
 };
 
+// DELETE /tasks/:id → remove a task
 export const deleteTask = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

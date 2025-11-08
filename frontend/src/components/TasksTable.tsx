@@ -1,16 +1,11 @@
 /**
- * TasksTable Component
- *
- * Description: Orchestrates task retrieval, sorting, pagination, and user actions while
- *              delegating UI rendering to smaller presentation components for easier maintenance.
- *
+ * Description: Task table container handling data loading, sorting, and actions.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { toast } from 'react-toastify';
-import { isAxiosError } from 'axios';
 import { Task } from '../types';
 import { getAllTasks, deleteTask } from '../services/taskService';
 import TasksTableHeader from './tasksTable/TasksTableHeader';
@@ -20,17 +15,7 @@ import DeleteTaskModal from './tasksTable/DeleteTaskModal';
 import TasksTableLoading from './tasksTable/TasksTableLoading';
 import TasksTableError from './tasksTable/TasksTableError';
 import TasksTableEmpty from './tasksTable/TasksTableEmpty';
-
-const getErrorMessage = (error: unknown, fallbackMessage: string): string => {
-  if (isAxiosError<{ error?: string }>(error)) {
-    const serverMessage = error.response?.data?.error;
-    return serverMessage ?? error.message ?? fallbackMessage;
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return fallbackMessage;
-};
+import { getErrorMessage } from '../utils/errorUtils';
 
 interface TasksTableProps {
   refreshKey?: number;
@@ -38,6 +23,7 @@ interface TasksTableProps {
 }
 
 const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
+  // Core state buckets
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,8 +35,10 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
+  // Allowed page sizes
   const rowsPerPageOptions = [5, 10, 20, 50, 100];
 
+  // Retrieve tasks from API
   const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
@@ -64,10 +52,12 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
     }
   }, []);
 
+  // Refresh list on load or refresh key change
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks, refreshKey]);
 
+  // Toggle sorting state
   const handleSort = (field: keyof Task) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -78,6 +68,7 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
     setCurrentPage(1);
   };
 
+  // Sort tasks client-side
   const sortedTasks = useMemo(() => {
     if (!sortField) {
       return tasks;
@@ -116,19 +107,23 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
 
+  // Slice data for current page
   const currentTasks = useMemo(() => {
     return sortedTasks.slice(startIndex, endIndex);
   }, [sortedTasks, startIndex, endIndex]);
 
+  // Update page index
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
+  // Change rows per page
   const handleRowsPerPageChange = (value: number) => {
     setRowsPerPage(value);
     setCurrentPage(1);
   };
 
+  // Kick off delete modal
   const handleDeleteTask = (id: number) => {
     const task = tasks.find((entry) => entry.id === id);
     if (task) {
@@ -137,6 +132,7 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
     }
   };
 
+  // Run deletion flow
   const handleConfirmDelete = async () => {
     if (!taskToDelete?.id) {
       return;
@@ -170,11 +166,13 @@ const TasksTable = ({ refreshKey = 0, onEditTask }: TasksTableProps) => {
     }
   };
 
+  // Close delete modal
   const handleCancelDelete = () => {
     setShowDeleteModal(false);
     setTaskToDelete(null);
   };
 
+  // Bubble edit event
   const handleEditTask = (id: number) => {
     const task = tasks.find((entry) => entry.id === id);
     if (task && onEditTask) {

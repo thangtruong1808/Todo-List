@@ -1,39 +1,30 @@
 /**
- * KanbanBoard Component
- *
- * Description: Kanban board component with drag-and-drop functionality.
- *              Displays tasks in columns based on their status.
- *              Allows users to drag tasks between columns to update status.
- *              Uses vertical scrolling to display all tasks in each column.
- *
+ * Description: Drag-and-drop Kanban board syncing tasks by status columns.
  * Date Created: 2025-November-06
  * Author: thangtruong
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { isAxiosError } from 'axios';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { toast } from 'react-toastify';
 import { Task, TaskStatus } from '../../types';
 import { getAllTasks, updateTask } from '../../services/taskService';
 import { getMelbourneTime, normalizeToMelbourneIso } from '../../utils/dateUtils';
+import { getErrorMessage } from '../../utils/errorUtils';
 import TaskCard from './TaskCard';
 import TaskDetailModal from './TaskDetailModal';
 import KanbanBoardLoading from './KanbanBoardLoading';
 
-// Status columns configuration - order of columns in Kanban board
-const statusColumns: TaskStatus[] = ['Pending', 'In Progress', 'Completed', 'Archived', 'Overdue'];
-// Column display names - mapping of status to display name
-const columnNames: Record<TaskStatus, string> = {
+const statusColumns: TaskStatus[] = ['Pending', 'In Progress', 'Completed', 'Archived', 'Overdue']; // Column ordering for board lanes
+const columnNames: Record<TaskStatus, string> = { // Display labels for column headers
   'Pending': 'Pending',
   'In Progress': 'In Progress',
   'Completed': 'Completed',
   'Archived': 'Archived',
   'Overdue': 'Overdue',
 };
-// Toast configuration for consistent notifications
-const toastOptions = {
+const toastOptions = { // Shared toast configuration for board actions
   position: 'bottom-left' as const,
   autoClose: 7000,
   hideProgressBar: false,
@@ -41,10 +32,10 @@ const toastOptions = {
   pauseOnHover: true,
   draggable: true,
 };
-// Closed statuses that should not move into Overdue directly
-const isClosedStatus = (status: TaskStatus) => status === 'Completed' || status === 'Archived';
-const isActiveStatus = (status: TaskStatus) => status === 'Pending' || status === 'In Progress';
-const hasDueDatePassed = (task: Task): boolean => {
+const isClosedStatus = (status: TaskStatus) => status === 'Completed' || status === 'Archived'; // Flags finished tasks
+const isActiveStatus = (status: TaskStatus) => status === 'Pending' || status === 'In Progress'; // Flags work-in-progress tasks
+
+const hasDueDatePassed = (task: Task): boolean => { // Confirms whether task due date has elapsed
   const normalized = normalizeToMelbourneIso(task.due_date);
   if (!normalized) {
     return false;
@@ -58,24 +49,13 @@ interface KanbanBoardProps {
   selectedStatuses?: TaskStatus[];
 }
 
-const getErrorMessage = (error: unknown, fallbackMessage: string): string => {
-  if (isAxiosError<{ error?: string }>(error)) {
-    const serverMessage = error.response?.data?.error;
-    return serverMessage ?? error.message ?? fallbackMessage;
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return fallbackMessage;
-};
-
 const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanBoardProps) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]); // All tasks available to render
+  const [loading, setLoading] = useState<boolean>(true); // Loading state for initial fetch
+  const [error, setError] = useState<string | null>(null); // Error text for fetch failures
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null); // Task selected for modal viewing
 
-  const fetchTasks = useCallback(async () => {
+  const fetchTasks = useCallback(async () => { // Pull tasks from backend service
     try {
       setLoading(true);
       setError(null);
@@ -88,18 +68,27 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
     }
   }, []);
 
-  useEffect(() => {
+  useEffect(() => { // Bootstrap tasks when component mounts
     fetchTasks();
   }, [fetchTasks]);
 
-  const getTasksByStatus = (status: TaskStatus): Task[] => tasks.filter((task) => task.status === status);
-  const getStatusPercentage = (status: TaskStatus): number => {
-    if (tasks.length === 0) return 0;
-    const statusTasks = getTasksByStatus(status);
-    return (statusTasks.length / tasks.length) * 100;
-  };
+  const tasksByStatus = useMemo(() => { // Group tasks by status for quicker lookups
+    return statusColumns.reduce((acc, status) => {
+      acc[status] = tasks.filter((task) => task.status === status);
+      return acc;
+    }, {} as Record<TaskStatus, Task[]>);
+  }, [tasks]);
 
-  const handleDragEnd = useCallback(async (result: DropResult) => {
+  const statusPercentages = useMemo(() => { // Calculate status distribution for header percentages
+    const totalTasks = tasks.length || 1;
+    return statusColumns.reduce((acc, status) => {
+      acc[status] = (tasksByStatus[status]?.length ?? 0) / totalTasks * 100;
+      return acc;
+    }, {} as Record<TaskStatus, number>);
+  }, [tasks.length, tasksByStatus]);
+
+  const handleDragEnd = useCallback(async (result: DropResult) => { // React DnD completion handler
+    // Ignore drops without meaningful moves
     const { destination, source, draggableId } = result;
     if (!destination) {
       return;
@@ -107,6 +96,7 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }
+    // Resolve dragged task from id
     const taskId = parseInt(draggableId, 10);
     if (isNaN(taskId)) {
       return;
@@ -115,10 +105,12 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
     if (!task || !task.id) {
       return;
     }
+    // Determine new status bucket
     const newStatus = destination.droppableId as TaskStatus;
     if (task.status === newStatus) {
       return;
     }
+    // Guard rails for overdue transitions
     if (newStatus === 'Overdue') {
       if (isClosedStatus(task.status)) {
         toast.error('Completed or archived tasks cannot be moved to Overdue. Please reopen the task first.', toastOptions);
@@ -137,36 +129,38 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
       toast.warn('Update the task due date before returning it to Pending or In Progress.', toastOptions);
       return;
     }
-    const updatedTasks = tasks.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t));
+    const updatedTasks = tasks.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)); // Apply optimistic update
     setTasks(updatedTasks);
     try {
-      await updateTask(task.id, { status: newStatus });
+      await updateTask(task.id, { status: newStatus }); // Persist change to backend
       toast.success(`Task "${task.title}" status updated to ${newStatus}`, toastOptions);
       if (onTaskUpdate) {
         onTaskUpdate();
       }
     } catch (error: unknown) {
-      setTasks(tasks);
+      setTasks(tasks); // Revert optimistic change
       toast.error(getErrorMessage(error, 'Failed to update task status. Please try again.'), toastOptions);
     }
   }, [tasks, onTaskUpdate]);
 
-  const handleTaskClick = (task: Task) => {
+  const handleTaskClick = (task: Task) => { // Capture the task user clicked for detail view
     setSelectedTask(task);
   };
-  const handleCloseModal = () => {
+  const handleCloseModal = () => { // Close the task detail modal
     setSelectedTask(null);
   };
 
   if (loading) {
-    return <KanbanBoardLoading />;
+    return <KanbanBoardLoading />; // Loading placeholder
   }
 
   if (error) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
+        {/* Error fallback */}
         <div className="text-center py-8">
           <p className="text-red-600 mb-4">{error}</p>
+          {/* Retry fetching tasks */}
           <button
             onClick={fetchTasks}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
@@ -180,19 +174,23 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
 
   return (
     <div className="w-full" key={`kanban-${tasks.length}-${selectedStatuses.join(',')}`}>
+      {/* Drag and drop context */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {/* Visible status columns */}
           {statusColumns.map((status) => {
             if (!selectedStatuses.includes(status)) {
               return null;
             }
-            const allColumnTasks = getTasksByStatus(status);
+            const allColumnTasks = tasksByStatus[status] ?? [];
+            const statusPercentage = statusPercentages[status] ?? 0;
             return (
               <div key={status} className="flex flex-col">
+                {/* Column header */}
                 <div className="bg-gray-100 rounded-t-lg p-3 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-gray-800">
-                      {columnNames[status]} <span className="text-xs text-gray-600">({allColumnTasks.length})</span> <span className="text-xs text-gray-500">- {getStatusPercentage(status).toFixed(2)}%</span>
+                      {columnNames[status]} <span className="text-xs text-gray-600">({allColumnTasks.length})</span> <span className="text-xs text-gray-500">- {statusPercentage.toFixed(2)}%</span>
                     </h3>
                   </div>
                 </div>
@@ -204,6 +202,7 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
                       className={`flex-1 min-h-[200px] max-h-[900px] p-3 rounded-b-lg transition-colors duration-200 ${snapshot.isDraggingOver ? 'bg-blue-50' : 'bg-gray-50'}`}
                       style={{ overflowY: 'auto' }}
                     >
+                      {/* Column tasks */}
                       {allColumnTasks.map((task, index) => {
                         const draggableId = task.id ? task.id.toString() : `task-${index}-${status}`;
                         return (
@@ -234,6 +233,7 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
           })}
         </div>
       </DragDropContext>
+      {/* Task detail modal */}
       <TaskDetailModal task={selectedTask} onClose={handleCloseModal} />
     </div>
   );
