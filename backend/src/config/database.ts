@@ -29,6 +29,7 @@ const pool = mysql.createPool({
   password: dbPassword,
   database: dbName,
   port: dbPort,
+  dateStrings: true, // Ensure MySQL returns DATETIME as strings to preserve local values
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
