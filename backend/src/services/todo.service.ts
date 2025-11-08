@@ -93,50 +93,42 @@ const toMelbourneTimestampString = (value?: string | Date | null): string | unde
   let isoCandidate: string;
 
   if (value instanceof Date) {
-    isoCandidate = value.toISOString();
-  } else {
-    const trimmed = value.trim();
-    if (!trimmed) {
+    const adjusted = value.toLocaleString('en-US', { timeZone: MELBOURNE_TIME_ZONE, hour12: false });
+    const normalized = adjusted.replace(',', '');
+    const match = normalized.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})$/);
+    if (!match) {
       return undefined;
     }
-    if (/([zZ]|[+-]\d{2}:\d{2})$/.test(trimmed)) {
-      isoCandidate = trimmed;
-    } else {
-      isoCandidate = `${trimmed.replace(' ', 'T')}Z`;
-    }
+    const [, month, day, year, hour, minute, second] = match;
+    const paddedMonth = month.padStart(2, '0');
+    const paddedDay = day.padStart(2, '0');
+    return `${year}-${paddedMonth}-${paddedDay} ${hour}:${minute}:${second}`;
   }
 
-  const date = new Date(isoCandidate);
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  if (!/([zZ]|[+-]\d{2}:\d{2})$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  const date = new Date(trimmed);
   if (Number.isNaN(date.getTime())) {
     return undefined;
   }
 
-  // Format the date to Melbourne timezone string
-  const formatter = new Intl.DateTimeFormat('en-AU', {
-    timeZone: MELBOURNE_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  });
-
-  // Format the date to Melbourne timezone string
-  const parts = formatter.formatToParts(date).reduce<Record<string, string>>((acc, part) => {
-    if (part.type !== 'literal') {
-      acc[part.type] = part.value;
-    }
-    return acc;
-  }, {});
-
-  const { year, month, day, hour, minute, second } = parts;
-  if (!year || !month || !day || !hour || !minute || !second) {
+  const adjusted = date.toLocaleString('en-US', { timeZone: MELBOURNE_TIME_ZONE, hour12: false });
+  const normalized = adjusted.replace(',', '');
+  const match = normalized.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})$/);
+  if (!match) {
     return undefined;
   }
-  
-  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+  const [, month, day, year, hour, minute, second] = match;
+  const paddedMonth = month.padStart(2, '0');
+  const paddedDay = day.padStart(2, '0');
+  return `${year}-${paddedMonth}-${paddedDay} ${hour}:${minute}:${second}`;
 };
 
 // Normalize task timestamps to Melbourne timezone string
