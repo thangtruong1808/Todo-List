@@ -129,7 +129,4 @@ const normalizeTaskTimestamps = (task: Task): Task => {
   };
 };
 
-const getOffsetMinutes = (_utcMs: number, _timeZone: string): number => 0;
-const formatDateInZone = (_date: Date, _timeZone: string): string | undefined => undefined;
-const convertZoneString = (_value: string, _fromZone: string, _toZone: string): string | undefined => undefined;
 

@@ -10,11 +10,11 @@
 
 import axios from 'axios';
 
-// Serverless Backend base URL
+// Used for Serverless database on Hostinger Provider
 const baseURL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'; 
   
-
+// Used for Local database
 // const baseURL = 'http://localhost:5000/api'; // Local base URL
   
 
