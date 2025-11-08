@@ -75,6 +75,26 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
   const onSubmit = async (data: TaskFormData) => {
     try {
       if (editingTask && editingTask.id) {
+        const attemptingOverdue = data.status === 'Overdue';
+        const dueDateIso = data.due_date ? fromMelbourneLocalInputToIso(data.due_date) : undefined;
+        const dueDateMs = dueDateIso ? new Date(dueDateIso).getTime() : undefined;
+        const nowMs = Date.now();
+
+        if (attemptingOverdue && (!dueDateMs || Number.isNaN(dueDateMs) || dueDateMs > nowMs)) {
+          toast.error(
+            'This task is not overdue yet. Update the due date or wait until it passes before moving it to Overdue.',
+            {
+              position: 'bottom-left',
+              autoClose: 7000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+            },
+          );
+          return;
+        }
+
         const updatedTask = await updateTask(editingTask.id, {
           title: data.title.trim(),
           description: data.description || undefined,

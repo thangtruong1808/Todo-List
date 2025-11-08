@@ -45,11 +45,10 @@ const hasDueDatePassed = (task: Task): boolean => { // Confirms whether task due
 };
 
 interface KanbanBoardProps {
-  onTaskUpdate?: () => void;
   selectedStatuses?: TaskStatus[];
 }
 
-const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanBoardProps) => {
+const KanbanBoard = ({ selectedStatuses = statusColumns }: KanbanBoardProps) => {
   const [tasks, setTasks] = useState<Task[]>([]); // All tasks available to render
   const [loading, setLoading] = useState<boolean>(true); // Loading state for initial fetch
   const [error, setError] = useState<string | null>(null); // Error text for fetch failures
@@ -133,15 +132,12 @@ const KanbanBoard = ({ onTaskUpdate, selectedStatuses = statusColumns }: KanbanB
     setTasks(updatedTasks);
     try {
       await updateTask(task.id, { status: newStatus }); // Persist change to backend
-      toast.success(`Task "${task.title}" status updated to ${newStatus}`, toastOptions);
-      if (onTaskUpdate) {
-        onTaskUpdate();
-      }
+      toast.success(`Task ID=${task.id} "${task.title}" status updated to ${newStatus}`, toastOptions);
     } catch (error: unknown) {
       setTasks(tasks); // Revert optimistic change
       toast.error(getErrorMessage(error, 'Failed to update task status. Please try again.'), toastOptions);
     }
-  }, [tasks, onTaskUpdate]);
+  }, [tasks]);
 
   const handleTaskClick = (task: Task) => { // Capture the task user clicked for detail view
     setSelectedTask(task);

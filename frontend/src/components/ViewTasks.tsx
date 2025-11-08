@@ -16,11 +16,6 @@ const ViewTasks = () => {
   // Active status filters
   const [selectedStatuses, setSelectedStatuses] = useState<TaskStatus[]>(allStatuses);
 
-  // Kanban refresh hook
-  const handleTaskUpdate = () => {
-    // No-op: KanbanBoard manages its own fetch cycle
-  };
-
   return (
     <div className="max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">View Tasks - Kanban Board</h1>
@@ -33,7 +28,7 @@ const ViewTasks = () => {
 
       {/* Kanban Board */}
       <div className="mb-8">
-        <KanbanBoard onTaskUpdate={handleTaskUpdate} selectedStatuses={selectedStatuses} />
+        <KanbanBoard selectedStatuses={selectedStatuses} />
       </div>
     </div>
   );
