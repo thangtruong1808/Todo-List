@@ -10,8 +10,11 @@
 
 import axios from 'axios';
 
-const baseURL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'; // Backend base URL
+// const baseURL =
+//   import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'; // Serverless Backend base URL
+
+const baseURL = 'http://localhost:5000/api'; // Local base URL
+  
 
 const api = axios.create({
   baseURL,

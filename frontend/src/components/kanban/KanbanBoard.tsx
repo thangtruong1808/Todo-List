@@ -167,6 +167,17 @@ const KanbanBoard = ({ selectedStatuses = statusColumns }: KanbanBoardProps) => 
       </div>
     );
   }
+  // No tasks to show yet message if no tasks are available in the database
+  if (tasks.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-10 text-center">
+        <h2 className="text-xl font-semibold text-gray-800 mb-3">No tasks to show yet</h2>
+        <p className="text-gray-600">
+          Create a task on the Tasks page or adjust the status filter to populate your Kanban board.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full" key={`kanban-${tasks.length}-${selectedStatuses.join(',')}`}>

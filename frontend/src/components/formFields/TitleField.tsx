@@ -47,7 +47,7 @@ const TitleField = ({ register, setValue, errors, touchedFields, watchedFields }
               noHtmlTags: (value) => !/<[^>]*>/.test(value) || 'HTML tags are not allowed',
               allowedCharacters: (value) =>
                 /^[A-Za-z0-9\s.,!?'"-]+$/.test(value) ||
-                'Title must contain only letters, numbers, spaces, and basic punctuation (., !, ?, \', ", -)',
+                'Title must contain only letters, numbers, spaces, and   (., !, ?, \', ", -)',
             },
           })}
           onInput={(e) => {
@@ -89,6 +89,11 @@ const TitleField = ({ register, setValue, errors, touchedFields, watchedFields }
       </div>
       {errors.title && (
         <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+      )}
+      {!errors.title && (
+        <p className="mt-1 text-xs text-gray-500">
+          Allowed characters: letters, numbers, spaces, and basic punctuation (., !, ?, &apos;, &quot;, -)
+        </p>
       )}
     </div>
   );
