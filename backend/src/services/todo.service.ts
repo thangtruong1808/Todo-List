@@ -4,7 +4,7 @@
  * Author: thangtruong
  */
 
-import pool from '../config/database';
+import pool, { DB_TIME_ZONE } from '../config/database';
 import { Task } from '../models/todo.model';
 
 export const taskService = {
@@ -84,25 +84,13 @@ export const taskService = {
 
 const MELBOURNE_TIME_ZONE = 'Australia/Melbourne';
 
-// Convert timestamp to Melbourne timezone string
 const toMelbourneTimestampString = (value?: string | Date | null): string | undefined => {
   if (!value) {
     return undefined;
   }
 
-  let isoCandidate: string;
-
   if (value instanceof Date) {
-    const adjusted = value.toLocaleString('en-US', { timeZone: MELBOURNE_TIME_ZONE, hour12: false });
-    const normalized = adjusted.replace(',', '');
-    const match = normalized.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})$/);
-    if (!match) {
-      return undefined;
-    }
-    const [, month, day, year, hour, minute, second] = match;
-    const paddedMonth = month.padStart(2, '0');
-    const paddedDay = day.padStart(2, '0');
-    return `${year}-${paddedMonth}-${paddedDay} ${hour}:${minute}:${second}`;
+    return formatDateInZone(value, MELBOURNE_TIME_ZONE);
   }
 
   const trimmed = value.trim();
@@ -111,24 +99,17 @@ const toMelbourneTimestampString = (value?: string | Date | null): string | unde
   }
 
   if (!/([zZ]|[+-]\d{2}:\d{2})$/.test(trimmed)) {
-    return trimmed;
+    if (DB_TIME_ZONE.toLowerCase() === MELBOURNE_TIME_ZONE.toLowerCase()) {
+      return trimmed;
+    }
+    return convertZoneString(trimmed, DB_TIME_ZONE, MELBOURNE_TIME_ZONE) ?? trimmed;
   }
 
   const date = new Date(trimmed);
   if (Number.isNaN(date.getTime())) {
     return undefined;
   }
-
-  const adjusted = date.toLocaleString('en-US', { timeZone: MELBOURNE_TIME_ZONE, hour12: false });
-  const normalized = adjusted.replace(',', '');
-  const match = normalized.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})$/);
-  if (!match) {
-    return undefined;
-  }
-  const [, month, day, year, hour, minute, second] = match;
-  const paddedMonth = month.padStart(2, '0');
-  const paddedDay = day.padStart(2, '0');
-  return `${year}-${paddedMonth}-${paddedDay} ${hour}:${minute}:${second}`;
+  return formatDateInZone(date, MELBOURNE_TIME_ZONE);
 };
 
 // Normalize task timestamps to Melbourne timezone string
@@ -141,5 +122,109 @@ const normalizeTaskTimestamps = (task: Task): Task => {
     created_at: createdAt ?? task.created_at,
     updated_at: updatedAt ?? task.updated_at,
   };
+};
+
+const getOffsetMinutes = (utcMs: number, timeZone: string): number => {
+  if (timeZone.toLowerCase() === 'local') {
+    return -new Date(utcMs).getTimezoneOffset();
+  }
+
+  try {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(new Date(utcMs)).reduce<Record<string, string>>((acc, part) => {
+      if (part.type !== 'literal') {
+        acc[part.type] = part.value;
+      }
+      return acc;
+    }, {});
+
+    const { year, month, day, hour, minute, second } = parts;
+    if (!year || !month || !day || !hour || !minute || !second) {
+      return 0;
+    }
+
+    const asUtc = Date.UTC(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hour),
+      Number(minute),
+      Number(second),
+    );
+
+    return (asUtc - utcMs) / 60000;
+  } catch {
+    return 0;
+  }
+};
+
+const formatDateInZone = (date: Date, timeZone: string): string | undefined => {
+  try {
+    const formatter = new Intl.DateTimeFormat('en-AU', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(date).reduce<Record<string, string>>((acc, part) => {
+      if (part.type !== 'literal') {
+        acc[part.type] = part.value;
+      }
+      return acc;
+    }, {});
+
+    const { year, month, day, hour, minute, second } = parts;
+    if (!year || !month || !day || !hour || !minute || !second) {
+      return undefined;
+    }
+
+    return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+  } catch {
+    return undefined;
+  }
+};
+
+const convertZoneString = (value: string, fromZone: string, toZone: string): string | undefined => {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
+  if (!match) {
+    return value;
+  }
+
+  if (fromZone.toLowerCase() === toZone.toLowerCase()) {
+    return value;
+  }
+
+  const [, year, month, day, hour, minute, second] = match;
+  const baseUtc = Date.UTC(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+    Number(second),
+  );
+
+  const fromOffset = getOffsetMinutes(baseUtc, fromZone);
+  const utcMs = baseUtc - fromOffset * 60000;
+
+  const toOffset = getOffsetMinutes(utcMs, toZone);
+  const targetMs = utcMs + toOffset * 60000;
+
+  return formatDateInZone(new Date(targetMs), toZone);
 };
 
