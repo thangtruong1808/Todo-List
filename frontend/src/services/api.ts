@@ -10,8 +10,8 @@
 
 import axios from 'axios';
 
-// API base URL - backend server endpoint
-const baseURL = 'http://localhost:5000/api';
+const baseURL =
+  import.meta.env.VITE_API_BASE_URL || '#'; // Backend base URL
 
 const api = axios.create({
   baseURL,
