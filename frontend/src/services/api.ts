@@ -11,8 +11,9 @@ const baseURL =
   import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_BASE_URL_LOCAL; 
   
 // Used for Local database
-// const baseURL = import.meta.env.VITE_API_BASE_URL_LOCAL; // Local base URL
-  
+// const baseURL = import.meta.env.VITE_API_LOCAL_BASE_URL; // Local base URL
+
+// const baseURL = "http://localhost:5000/api"; // Local base URL
 
 const api = axios.create({
   baseURL,
