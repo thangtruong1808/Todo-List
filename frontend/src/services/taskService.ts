@@ -14,6 +14,7 @@ import { normalizeToMelbourneIso } from '../utils/dateUtils';
 
 const isActiveStatus = (status: TaskStatus) => status === 'Pending' || status === 'In Progress';
 
+// This function checks if a task should be marked as overdue.
 const shouldMarkTaskAsOverdue = (task: Task, now: Date): task is Task & { id: number } => {
   if (!task.id) {
     return false;
@@ -40,6 +41,7 @@ const shouldMarkTaskAsOverdue = (task: Task, now: Date): task is Task & { id: nu
   return dueDate.getTime() < now.getTime();
 };
 
+// This function checks if a task should be reset to the pending status.
 const shouldResetOverdueStatus = (task: Task, now: Date): task is Task & { id: number } => {
   if (!task.id) {
     return false;
@@ -66,6 +68,7 @@ const shouldResetOverdueStatus = (task: Task, now: Date): task is Task & { id: n
   return dueDate.getTime() >= now.getTime();
 };
 
+// This function normalizes the overdue tasks.
 const normalizeOverdueTasks = async (tasks: Task[]): Promise<Task[]> => {
   const now = new Date();
   const overdueCandidates = tasks.filter((task): task is Task & { id: number } => shouldMarkTaskAsOverdue(task, now));
@@ -75,6 +78,7 @@ const normalizeOverdueTasks = async (tasks: Task[]): Promise<Task[]> => {
     return tasks;
   }
 
+  // This function updates the overdue tasks.
   const updates = await Promise.all(
     [
       ...overdueCandidates.map<Task & { desiredStatus: TaskStatus }>((task) => ({ ...task, desiredStatus: 'Overdue' })),
@@ -83,12 +87,13 @@ const normalizeOverdueTasks = async (tasks: Task[]): Promise<Task[]> => {
       try {
         const response = await api.put(`/tasks/${task.id}`, { status: task.desiredStatus satisfies TaskStatus });
         return response.data as Task;
-      } catch (error) {
+      } catch (error) { // If the task is not updated, return null.
         return null;
       }
     })
   );
 
+  // This function updates the overdue tasks.
   const updatedTaskMap = new Map<number, Task>();
   updates
     .filter((result): result is Task => result !== null && typeof result.id === 'number')
@@ -96,6 +101,7 @@ const normalizeOverdueTasks = async (tasks: Task[]): Promise<Task[]> => {
       updatedTaskMap.set(updatedTask.id!, updatedTask);
     });
 
+  // This function returns the updated tasks.
   return tasks.map((task) => {
     if (task.id && updatedTaskMap.has(task.id)) {
       return updatedTaskMap.get(task.id)!;

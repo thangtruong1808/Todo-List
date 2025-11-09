@@ -33,7 +33,7 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
     watch,
     reset,
     setValue,
-  } = useForm<TaskFormData>({
+  } = useForm<TaskFormData>({ // This function creates a new task.
     defaultValues: {
       status: 'Pending',
     },
@@ -44,14 +44,14 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
 
   // Load edit context or reset defaults
   useEffect(() => {
-    if (editingTask) {
+    if (editingTask) { // If the task is being edited, load the task data.
       setValue('title', editingTask.title);
       setValue('description', editingTask.description || '');
       setValue('status', editingTask.status);
       setValue('taskcode', editingTask.taskcode);
       setValue('due_date', toMelbourneDateTimeLocal(editingTask.due_date));
     } else {
-      reset({
+      reset({ // If the task is not being edited, reset the form data.
         status: 'Pending',
       });
     }
@@ -74,14 +74,15 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
   // Persist task changes
   const onSubmit = async (data: TaskFormData) => {
     try {
-      if (editingTask && editingTask.id) {
+      if (editingTask && editingTask.id) { // If the task is being edited, update the task.
         const attemptingOverdue = data.status === 'Overdue';
         const dueDateIso = data.due_date ? fromMelbourneLocalInputToIso(data.due_date) : undefined;
         const dueDateMs = dueDateIso ? new Date(dueDateIso).getTime() : undefined;
         const nowMs = Date.now();
 
         if (attemptingOverdue && (!dueDateMs || Number.isNaN(dueDateMs) || dueDateMs > nowMs)) {
-          toast.error(
+          // If the task is not overdue yet, update the due date or wait until it passes before moving it to Overdue.
+          toast.error( // This function displays an error message.
             'This task is not overdue yet. Update the due date or wait until it passes before moving it to Overdue.',
             {
               position: 'bottom-left',
@@ -95,6 +96,7 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
           return;
         }
 
+        // This function updates the task.
         const updatedTask = await updateTask(editingTask.id, {
           title: data.title.trim(),
           description: data.description || undefined,
@@ -102,7 +104,7 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
           taskcode: data.taskcode.toUpperCase(),
           due_date: fromMelbourneLocalInputToIso(data.due_date),
         });
-        toast.success(`Task has been successfully updated. ID=${updatedTask.id}, Title="${updatedTask.title}"`, {
+        toast.success(`Task has been successfully updated. ID=${updatedTask.id}, Title="${updatedTask.title}"`, { // This function displays a success message.
           position: 'bottom-left',
           autoClose: 7000,
           hideProgressBar: false,
@@ -111,6 +113,7 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
           draggable: true,
         });
       } else {
+        // This function creates a new task.
         const newTask = await createTask({
           title: data.title.trim(),
           description: data.description || undefined,
@@ -118,7 +121,7 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
           taskcode: data.taskcode.toUpperCase(),
           due_date: fromMelbourneLocalInputToIso(data.due_date),
         });
-        toast.success(`Task has been successfully created. ID=${newTask.id}, Title="${newTask.title}"`, {
+        toast.success(`Task has been successfully created. ID=${newTask.id}, Title="${newTask.title}"`, { // This function displays a success message.
           position: 'bottom-left',
           autoClose: 7000,
           hideProgressBar: false,
@@ -127,9 +130,9 @@ const CreateTaskForm = ({ onTaskCreated, editingTask, onCancelEdit }: CreateTask
           draggable: true,
         });
       }
-      reset();
+      reset(); // This function resets the form data.
       onTaskCreated();
-      if (onCancelEdit) {
+      if (onCancelEdit) { // If the task is being edited, cancel the edit.
         onCancelEdit();
       }
     } catch (error: unknown) {
